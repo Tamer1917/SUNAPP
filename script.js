@@ -1,17 +1,15 @@
-// تأكد من تحميل مكتبة Telegram WebApp
+// تأكد من تحميل Telegram WebApp
 window.Telegram.WebApp.ready();
 
 // استخراج بيانات المستخدم
 const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 
 if (tgUser) {
-    console.log("User ID:", tgUser.id);  // رقم معرف المستخدم
-    console.log("First Name:", tgUser.first_name);  // الاسم الأول
-    console.log("Last Name:", tgUser.last_name || "غير متوفر");  // اسم العائلة
-    console.log("Username:", tgUser.username || "غير متوفر");  // اسم المستخدم
-    console.log("Language Code:", tgUser.language_code);  // لغة المستخدم
+    console.log("User ID:", tgUser.id);
+    console.log("First Name:", tgUser.first_name);
+    console.log("Username:", tgUser.username || "غير متوفر");
 
-    // عرض البيانات على الصفحة
+    // عرض البيانات في الصفحة
     document.getElementById("username").textContent = tgUser.first_name;
     document.getElementById("user_id").textContent = tgUser.id;
 } else {
