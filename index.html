@@ -4,104 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram WebApp</title>
+
+    <!-- مكتبة Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
+    <!-- خط Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+
     <script type="module" src="script.js"></script>
+
     <style>
-        /* شاشة التحميل */
-        body, html {
+        /* ✅ تحسين الخطوط والتنسيقات العامة */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body, html {
+            background: linear-gradient(to bottom, #1e1e2f, #12121a);
+            color: white;
+            text-align: center;
             height: 100%;
             width: 100%;
             overflow: hidden;
         }
 
+        /* ✅ شاشة التحميل */
         .loading-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: url('material/images/loading.gif') no-repeat center center fixed;
-            background-size: cover;
+            background-color: #12121a;
             color: white;
-            text-align: center;
-            font-family: Arial, sans-serif;
+            font-size: 22px;
+            font-weight: bold;
             position: absolute;
             width: 100%;
-            height: 100%;
             z-index: 10;
         }
 
-        .loading-container h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .spinner {
-            border: 8px solid rgba(255, 255, 255, 0.1);
-            border-left: 8px solid #d5d7dd;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-top: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* باقي تنسيقات الصفحة */
-        body.loaded {
-            overflow: auto;
-        }
-
-        .hidden {
-            display: none;
-        }
-
+        /* ✅ تصميم المربع العلوي (اسم المستخدم والنقاط) */
         .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 350px;
+            margin: 20px auto 10px;
             text-align: center;
-            margin-top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            height: 120px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .username {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
-            margin-bottom: 10px;
         }
 
         .points {
             font-size: 20px;
-            color: green;
+            color: #facc15;
+            font-weight: bold;
         }
 
-        #balance-container {
-            margin: 20px;
-            font-size: 18px;
+        /* ✅ تحسين شريط التقدم */
+        .progress-container {
+            width: 80%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto;
+            padding: 5px;
+            position: relative;
+            top: -10px; /* تحريكه للأعلى قليلاً */
         }
 
+        .progress-bar {
+            width: 0%;
+            height: 12px;
+            background: linear-gradient(to right, #facc15, #ff9800);
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            line-height: 12px;
+            font-size: 14px;
+            color: white;
+        }
+
+        /* ✅ زر CLIM */
+        #claim-btn {
+            display: none;
+            background: linear-gradient(to right, #ff9800, #facc15);
+            color: black;
+            font-weight: bold;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 25px;
+            margin-top: 15px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #claim-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ✅ تحسين تصميم المهام */
         .task-container {
-            margin: 10px auto;
-            margin-top: 40px;
-            max-width: 600px;
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .task {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             padding: 15px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .task:hover {
+            transform: scale(1.02);
         }
 
         .task h4 {
@@ -110,24 +148,30 @@
         }
 
         .task-button {
-            background-color: #28a745;
-            color: white;
+            background-color: #facc15;
+            color: black;
+            font-weight: bold;
             border: none;
             padding: 10px 15px;
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
+            font-size: 14px;
+            border-radius: 20px;
+            transition: transform 0.2s ease-in-out;
         }
 
         .task-button:hover {
-            background-color: #218838;
+            transform: scale(1.1);
         }
 
+        /* ✅ تصميم شريط التنقل السفلي */
         nav.bottom-nav {
             display: flex;
             justify-content: space-around;
-            background-color: #333;
-            padding: 10px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
 
         nav.bottom-nav .nav-item {
@@ -140,190 +184,54 @@
         }
 
         nav.bottom-nav .nav-item:hover {
-            color: #ddd;
+            color: #facc15;
         }
 
-        /* شريط التقدم */
-       /* شريط التقدم */
-.progress-container {
-    width: 50%; /* تصغير العرض بنسبة 70% */
-    background-color: #ddd;
-    border-radius: 10px;
-    position: absolute; /* لتحديد موقعه في الصفحة */
-    top: 35%; /* تحديد الموقع من الأعلى */
-    left: 50%; /* تحديد الموقع من اليسار */
-    transform: translate(-50%, -50%); /* نقل الشريط إلى المنتصف تمامًا */
-    margin: 20px 0;
-    padding: 0 10px;
-}
-
-.progress-bar {
-    width: 0%;
-    height: 20px; /* تقليص الارتفاع بنسبة 70% */
-    background-color: #4CAF50;
-    border-radius: 10px;
-    text-align: center;
-    line-height: 14px;
-    color: white;
-    font-weight: bold;
-}
-
-.progress-text {
-    position: absolute;
-    width: 100%;
-    top: 0;
-    line-height: 14px;
-    font-size: 14px;
-    color: black;
-}
-
-        }
-
-        #claim-btn {
-            display: none;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        #claim-btn:hover {
-            background-color: #218838;
-        }
     </style>
 </head>
 <body>
+
     <!-- شاشة التحميل -->
-    <div class="loading-container" id="loading-screen">
-        <div>
-            <h1>Loading...</h1>
-            <div class="spinner"></div>
-        </div>
-    </div>
+    <div class="loading-container" id="loading-screen">جار التحميل...</div>
 
     <!-- الصفحة الرئيسية -->
     <div id="main-content" class="hidden">
         <div class="container">
-            <h1>مرحبًا بك في التطبيق!</h1>
             <div class="username" id="username">اسم المستخدم: ...</div>
             <div class="points" id="points">عدد النقاط: ...</div>
         </div>
 
-        <!-- شريط التقدم في التعدين -->
+        <!-- شريط التقدم -->
         <div class="progress-container">
             <div class="progress-bar" id="mining-progress"></div>
             <div class="progress-text" id="progress-text">0 / 5</div>
         </div>
 
         <!-- زر CLIM -->
-        <button id="claim-btn" onclick="claimPoints()">🦴 CLIM</button>
+        <button id="claim-btn">🦴 CLIM</button>
 
+        <!-- المهام -->
         <div class="task-container">
-            <!-- المهام -->
             <div class="task">
-                <div class="task-detail">
-                    <div class="task-image">
-                        <img src="material/images/logo.png" width="45px" alt="Coin Icon">
-                    </div>
-                    <div>
-                        <h4>claim rewards</h4>
-                        <div class="task-data">
-                            <img src="material/images/logo.png" width="20px" alt="Coin Icon">
-                            <h5>300</h5>
-                        </div>
-                    </div>
-                </div>
-                <button class="task-button" onclick="completeTask(300, 'reward.html')">🦴 claim</button>
+                <h4>مهمة يومية</h4>
+                <button class="task-button">إكمال</button>
             </div>
         </div>
 
+        <!-- شريط التنقل -->
         <nav class="bottom-nav">
-            <a href="home.html" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>HOME</span>
-            </a>
-            <a href="leaderboard.html" class="nav-item">
-                <i class="fas fa-trophy"></i>
-                <span>LEADERBOARD</span>
-            </a>
-            <a href="invite-friends.html" class="nav-item">
-                <i class="fas fa-user-friends"></i>
-                <span>FRIENDS</span>
-            </a>
-            <a href="task.html" class="nav-item">
-                <i class="fas fa-tasks"></i>
-                <span>TASKS</span>
-            </a>
-            <a href="balance.html" class="nav-item">
-                <i class="fas fa-wallet"></i>
-                <span>BALANCE</span>
-            </a>
+            <a href="#" class="nav-item">🏠 الصفحة الرئيسية</a>
+            <a href="#" class="nav-item">🏆 الترتيب</a>
+            <a href="#" class="nav-item">👥 الأصدقاء</a>
         </nav>
     </div>
 
-    <!-- جافا سكريبت لدمج البيانات -->
     <script>
-        let miningPoints = 0;
-        let miningInterval;
-
-        function startMining() {
-            miningInterval = setInterval(() => {
-                if (miningPoints < 5) {
-                    miningPoints++;
-                    updateProgressBar();
-                }
-
-                if (miningPoints === 5) {
-                    document.getElementById("claim-btn").style.display = "block";
-                    clearInterval(miningInterval);
-                }
-            }, 4000); // لكل 4 ثوانٍ (استبدلها بـ 14400000 للوقت الفعلي: 4 ساعات)
-        }
-
-        function updateProgressBar() {
-            let progressBar = document.getElementById("mining-progress");
-            let progressText = document.getElementById("progress-text");
-
-            let percentage = (miningPoints / 5) * 100;
-            progressBar.style.width = percentage + "%";
-            progressText.innerText = `${miningPoints} / 5`;
-        }
-
-        function claimPoints() {
-            alert("تم استلام المكافأة! 🎉");
-            miningPoints = 0;
-            updateProgressBar();
-            document.getElementById("claim-btn").style.display = "none";
-            startMining(); // إعادة بدء التعدين
-        }
-
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                username: params.get("username") || "غير معروف",
-                points: params.get("points") || "0"
-            };
-        }
-
-        // استدعاء الدالة وعرض البيانات
-        window.onload = function() {
-            const data = getQueryParams();
-            document.getElementById('username').textContent = "اسم المستخدم: " + data.username;
-            document.getElementById('points').textContent = "عدد النقاط: " + data.points;
-
-            // معالجة شاشة التحميل
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                document.body.classList.add('loaded');
-
-                startMining(); // بدء عملية التعدين
-            }, 3000);
-        };
+        setTimeout(() => {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-content').classList.remove('hidden');
+        }, 2000);
     </script>
+
 </body>
 </html>
