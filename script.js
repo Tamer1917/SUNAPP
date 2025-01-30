@@ -86,19 +86,8 @@ function startProgress(initialPoints, userRef) {
 
             // عرض زر CLAIM
             document.getElementById("claim-btn").classList.remove("hidden");
-
-            // إضافة 5 نقاط للمستخدم بعد اكتمال التقدم
-            updateUserPoints(userRef, initialPoints + 5);
         }
     }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
-}
-
-// تحديث النقاط في قاعدة البيانات
-async function updateUserPoints(userRef, newPoints) {
-    await updateDoc(userRef, {
-        points: newPoints
-    });
-    document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
 }
 
 // وظيفة سحب النقاط عند الضغط على زر CLAIM
@@ -121,6 +110,14 @@ async function claimReward() {
         // إعادة تعيين شريط التقدم
         resetProgress();
     }
+}
+
+// تحديث النقاط في قاعدة البيانات
+async function updateUserPoints(userRef, newPoints) {
+    await updateDoc(userRef, {
+        points: newPoints
+    });
+    document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
 }
 
 // إعادة تعيين شريط التقدم
