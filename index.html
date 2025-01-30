@@ -6,19 +6,6 @@
     <title>Telegram WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module" src="script.js"></script>
-</head>
-<body>
-    <h1>مرحبًا <span id="username">...</span>!</h1>
-    <p>نقاطك: <span id="points">0</span></p>
-</body>
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معلومات المستخدم و المهام</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="material/css/styles.css">
     <style>
         /* شاشة التحميل */
         body, html {
@@ -153,6 +140,55 @@
         nav.bottom-nav .nav-item:hover {
             color: #ddd;
         }
+
+        /* شريط التقدم */
+        .progress-container {
+            width: 70%; /* تصغير العرض بنسبة 70% */
+            background-color: #ddd;
+            border-radius: 10px;
+            position: absolute; /* لتحديد موقعه في الصفحة */
+            top: 50%; /* تحديد الموقع من الأعلى */
+            left: 50%; /* تحديد الموقع من اليسار */
+            transform: translate(-50%, -50%); /* نقل الشريط إلى المنتصف تمامًا */
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 14px; /* تقليص الارتفاع بنسبة 70% */
+            background-color: #4CAF50;
+            border-radius: 10px;
+            text-align: center;
+            line-height: 14px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            line-height: 14px;
+            font-size: 14px;
+            color: black;
+        }
+
+        #claim-btn {
+            display: none;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #claim-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -172,12 +208,21 @@
             <div class="points" id="points">عدد النقاط: ...</div>
         </div>
 
+        <!-- شريط التقدم في التعدين -->
+        <div class="progress-container">
+            <div class="progress-bar" id="mining-progress"></div>
+            <div class="progress-text" id="progress-text">0 / 5</div>
+        </div>
+
+        <!-- زر CLIM -->
+        <button id="claim-btn" onclick="claimPoints()">🦴 CLIM</button>
+
         <div class="task-container">
             <!-- المهام -->
             <div class="task">
                 <div class="task-detail">
                     <div class="task-image">
-                        <img src="material/images/logo.png" width="45px" alt="">
+                        <img src="material/images/logo.png" width="45px" alt="Coin Icon">
                     </div>
                     <div>
                         <h4>claim rewards</h4>
@@ -217,6 +262,40 @@
 
     <!-- جافا سكريبت لدمج البيانات -->
     <script>
+        let miningPoints = 0;
+        let miningInterval;
+
+        function startMining() {
+            miningInterval = setInterval(() => {
+                if (miningPoints < 5) {
+                    miningPoints++;
+                    updateProgressBar();
+                }
+
+                if (miningPoints === 5) {
+                    document.getElementById("claim-btn").style.display = "block";
+                    clearInterval(miningInterval);
+                }
+            }, 4000); // لكل 4 ثوانٍ (استبدلها بـ 14400000 للوقت الفعلي: 4 ساعات)
+        }
+
+        function updateProgressBar() {
+            let progressBar = document.getElementById("mining-progress");
+            let progressText = document.getElementById("progress-text");
+
+            let percentage = (miningPoints / 5) * 100;
+            progressBar.style.width = percentage + "%";
+            progressText.innerText = `${miningPoints} / 5`;
+        }
+
+        function claimPoints() {
+            alert("تم استلام المكافأة! 🎉");
+            miningPoints = 0;
+            updateProgressBar();
+            document.getElementById("claim-btn").style.display = "none";
+            startMining(); // إعادة بدء التعدين
+        }
+
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -236,6 +315,8 @@
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
                 document.body.classList.add('loaded');
+
+                startMining(); // بدء عملية التعدين
             }, 3000);
         };
     </script>
