@@ -3,12 +3,12 @@ import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10
 
 // 🔹 إعداد Firebase
 const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
+    apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
+    authDomain: "sunapp-85501.firebaseapp.com",
+    projectId: "sunapp-85501",
+    storageBucket: "sunapp-85501.firebasestorage.app",
+    messagingSenderId: "146439638941",
+    appId: "1:146439638941:web:abef499250246650c6e974"
 };
 
 const app = initializeApp(firebaseConfig);
