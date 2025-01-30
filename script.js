@@ -85,7 +85,7 @@ function startProgress(initialPoints, userRef) {
             clearInterval(progressInterval);
 
             // عرض زر CLAIM
-            document.getElementById("claim-btn").classList.remove("hidden");
+            document.getElementById("claim-btn").style.display = "block"; // إظهار الزر
         }
     }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
 }
@@ -105,7 +105,7 @@ async function claimReward() {
         await updateUserPoints(userRef, currentPoints + 5);
 
         // إخفاء زر CLAIM بعد السحب
-        document.getElementById("claim-btn").classList.add("hidden");
+        document.getElementById("claim-btn").style.display = "none"; // إخفاء الزر
 
         // إعادة تعيين شريط التقدم
         resetProgress();
