@@ -165,5 +165,52 @@
         </div>
     </div>
 
+    <script type="module">
+        // تأكد من أن الصفحة قد تم تحميلها بشكل كامل
+        window.addEventListener("load", function() {
+            // عناصر DOM الخاصة بشريط التقدم
+            const progressBar = document.getElementById("mining-progress");
+            const progressText = document.getElementById("progress-text");
+            const claimBtn = document.getElementById("claim-btn");
+
+            // التقدم المبدئي
+            let progress = 0;
+
+            // تحديث شريط التقدم
+            function updateProgress() {
+                if (progress < 100) {
+                    progress += 20; // زيادة التقدم
+                    progressBar.style.width = progress + "%"; // تحديث عرض شريط التقدم
+                    progressText.innerText = `${progress / 20} / 5`; // تحديث النص داخل شريط التقدم
+
+                    // إذا وصل التقدم إلى 100%
+                    if (progress === 100) {
+                        claimBtn.style.display = "block"; // إظهار زر CLAIM
+                    }
+                }
+            }
+
+            // تحديث التقدم بشكل دوري
+            setInterval(updateProgress, 2000); // كل 2 ثانية
+
+            // دالة للمطالبة بالمكافأة
+            function claimReward() {
+                alert("🎉 تم استلام المكافأة!");
+
+                // إعادة تعيين التقدم
+                progress = 0;
+                progressBar.style.width = "0%"; // إعادة تعيين عرض شريط التقدم
+                progressText.innerText = "0 / 5"; // تحديث النص إلى "0 / 5"
+                claimBtn.style.display = "none"; // إخفاء زر CLAIM
+            }
+
+            // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+            }, 2000);
+        });
+    </script>
+
 </body>
 </html>
