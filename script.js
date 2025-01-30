@@ -1,43 +1,64 @@
-let progress = localStorage.getItem("progress") ? parseInt(localStorage.getItem("progress")) : 0;
-const progressBar = document.getElementById("mining-progress");
-const progressText = document.getElementById("progress-text");
-const claimBtn = document.getElementById("claim-btn");
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-function updateProgress() {
-    if (progress < 100) {
-        progress += 20; // زيادة التقدم
-        progressBar.style.width = progress + "%"; // تحديث عرض شريط التقدم
-        progressText.innerText = `${progress / 20} / 5`; // تحديث النص داخل شريط التقدم
+// 🔹 إعداد Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
+    authDomain: "sunapp-85501.firebaseapp.com",
+    projectId: "sunapp-85501",
+    storageBucket: "sunapp-85501.firebasestorage.app",
+    messagingSenderId: "146439638941",
+    appId: "1:146439638941:web:abef499250246650c6e974"
+};
 
-        // حفظ التقدم في localStorage
-        localStorage.setItem("progress", progress);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-        // إذا وصل التقدم إلى 100%
-        if (progress === 100) {
-            claimBtn.style.display = "block"; // إظهار زر CLAIM
+// 🔹 جلب بيانات المستخدم من Telegram
+window.Telegram.WebApp.ready();
+const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+
+if (tgUser) {
+    const userId = tgUser.id.toString();
+    const username = tgUser.first_name;
+
+    console.log("User ID:", userId);
+    console.log("First Name:", username);
+
+    async function checkAndCreateUser(userId, username) {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            // 🔹 المستخدم موجود، جلب بياناته
+            const userData = userSnap.data();
+            console.log("المستخدم موجود:", userData);
+
+            document.getElementById("username").textContent = userData.username || username;
+            document.getElementById("points").textContent = userData.points || 0;
+        } else {
+            // 🆕 المستخدم جديد، منحه 5 نقاط
+            console.log("🚀 مستخدم جديد! يتم منحه 5 نقاط.");
+
+            await setDoc(userRef, {
+                username: username,
+                points: 5
+            });
+
+            document.getElementById("username").textContent = username;
+            document.getElementById("points").textContent = 5;
         }
     }
-}
 
-// هذه الدالة تقوم بتحديث التقدم كل 2 ثانية
-setInterval(updateProgress, 2000);
-
-// دالة للمطالبة بالمكافأة
-function claimReward() {
-    alert("🎉 تم استلام المكافأة!");
-
-    // إعادة تعيين التقدم
-    progress = 0;
-    progressBar.style.width = "0%"; // إعادة تعيين عرض شريط التقدم
-    progressText.innerText = "0 / 5"; // تحديث النص إلى "0 / 5"
-    claimBtn.style.display = "none"; // إخفاء زر CLAIM
-
-    // حفظ التقدم الجديد (0) في localStorage
-    localStorage.setItem("progress", progress);
+    checkAndCreateUser(userId, username);
+} else {
+    console.log("تعذر الحصول على بيانات المستخدم من Telegram.");
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
-setTimeout(() => {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('main-content').classList.remove('hidden');
-}, 2000);
+window.addEventListener("load", function() {
+    setTimeout(() => {
+        document.getElementById('loading-screen').style.display = 'none';
+        document.getElementById('main-content').classList.remove('hidden');
+    }, 2000);
+});
