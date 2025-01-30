@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -5,9 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script type="module" src="script.js"></script>
+</head>
+<body>
+    <h1>مرحبًا <span id="username">...</span>!</h1>
+    <p>نقاطك: <span id="points">0</span></p>
+</body>
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معلومات المستخدم و المهام</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="material/css/styles.css">
     <style>
         /* شاشة التحميل */
         body, html {
@@ -86,40 +98,30 @@
             color: green;
         }
 
-        .progress-container {
-            width: 70%;
-            background-color: #ddd;
-            border-radius: 10px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            margin: 20px 0;
-            padding: 0 10px;
-        }
-        
-        .progress-bar {
-            width: 0%;
-            height: 14px;
-            background-color: #4CAF50;
-            border-radius: 10px;
-            text-align: center;
-            line-height: 14px;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .progress-text {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            line-height: 14px;
-            font-size: 14px;
-            color: black;
+        #balance-container {
+            margin: 20px;
+            font-size: 18px;
         }
 
-        #claim-btn {
-            display: none;
+        .task-container {
+            margin: 10px auto;
+            max-width: 600px;
+        }
+
+        .task {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .task h4 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .task-button {
             background-color: #28a745;
             color: white;
             border: none;
@@ -127,10 +129,9 @@
             cursor: pointer;
             font-size: 16px;
             border-radius: 5px;
-            margin-top: 10px;
         }
 
-        #claim-btn:hover {
+        .task-button:hover {
             background-color: #218838;
         }
 
@@ -172,93 +173,51 @@
             <div class="points" id="points">عدد النقاط: ...</div>
         </div>
 
-        <!-- شريط التقدم في التعدين -->
-        <div class="progress-container">
-            <div class="progress-bar" id="mining-progress"></div>
-            <div class="progress-text" id="progress-text">0 / 5</div>
+        <div class="task-container">
+            <!-- المهام -->
+            <div class="task">
+                <div class="task-detail">
+                    <div class="task-image">
+                        <img src="material/images/logo.png" width="45px" alt="">
+                    </div>
+                    <div>
+                        <h4>claim rewards</h4>
+                        <div class="task-data">
+                            <img src="material/images/logo.png" width="20px" alt="Coin Icon">
+                            <h5>300</h5>
+                        </div>
+                    </div>
+                </div>
+                <button class="task-button" onclick="completeTask(300, 'reward.html')">🦴 claim</button>
+            </div>
         </div>
 
-        <!-- زر CLIM -->
-        <button id="claim-btn" onclick="claimPoints()">🦴 CLIM</button>
-
         <nav class="bottom-nav">
-            <a href="home.html" class="nav-item">HOME</a>
-            <a href="leaderboard.html" class="nav-item">LEADERBOARD</a>
-            <a href="invite-friends.html" class="nav-item">FRIENDS</a>
-            <a href="task.html" class="nav-item">TASKS</a>
-            <a href="balance.html" class="nav-item">BALANCE</a>
+            <a href="home.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>HOME</span>
+            </a>
+            <a href="leaderboard.html" class="nav-item">
+                <i class="fas fa-trophy"></i>
+                <span>LEADERBOARD</span>
+            </a>
+            <a href="invite-friends.html" class="nav-item">
+                <i class="fas fa-user-friends"></i>
+                <span>FRIENDS</span>
+            </a>
+            <a href="task.html" class="nav-item">
+                <i class="fas fa-tasks"></i>
+                <span>TASKS</span>
+            </a>
+            <a href="balance.html" class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>BALANCE</span>
+            </a>
         </nav>
     </div>
 
     <!-- جافا سكريبت لدمج البيانات -->
     <script>
-        // إعداد Firebase باستخدام معلومات مشروعك
-        const firebaseConfig = {
-            apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
-            authDomain: "sunapp-85501.firebaseapp.com",
-            databaseURL: "https://sunapp-85501-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "sunapp-85501",
-            storageBucket: "sunapp-85501.firebasestorage.app",
-            messagingSenderId: "146439638941",
-            appId: "1:146439638941:web:abef499250246650c6e974"
-        };
-        
-        // تهيئة Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database(app);
-
-        let miningPoints = 0;
-        let miningInterval;
-
-        function startMining() {
-            miningInterval = setInterval(() => {
-                if (miningPoints < 5) {
-                    miningPoints++;
-                    updateProgressBar();
-                }
-
-                if (miningPoints === 5) {
-                    document.getElementById("claim-btn").style.display = "block";
-                    clearInterval(miningInterval);
-                }
-            }, 4000); // لكل 4 ثوانٍ
-        }
-
-        function updateProgressBar() {
-            let progressBar = document.getElementById("mining-progress");
-            let progressText = document.getElementById("progress-text");
-
-            let percentage = (miningPoints / 5) * 100;
-            progressBar.style.width = percentage + "%";
-            progressText.innerText = `${miningPoints} / 5`;
-        }
-
-        function claimPoints() {
-            const userId = "user_id";  // هذا يجب أن يكون معرف المستخدم
-            const userRef = database.ref('users/' + userId);
-
-            // جلب البيانات الحالية للمستخدم
-            userRef.once('value').then((snapshot) => {
-                const userData = snapshot.val();
-                const newPoints = userData.points + 300; // إضافة 300 نقطة كمثال
-
-                // تحديث الرصيد في قاعدة البيانات
-                userRef.update({
-                    points: newPoints
-                }).then(() => {
-                    alert("تم استلام المكافأة! 🎉");
-                    // تحديث الرصيد في الصفحة
-                    document.getElementById("points").textContent = "عدد النقاط: " + newPoints;
-                    miningPoints = 0;
-                    updateProgressBar();
-                    document.getElementById("claim-btn").style.display = "none";
-                    startMining(); // إعادة بدء التعدين
-                }).catch((error) => {
-                    console.error("حدث خطأ عند تحديث الرصيد:", error);
-                });
-            });
-        }
-
         function getQueryParams() {
             const params = new URLSearchParams(window.location.search);
             return {
@@ -278,8 +237,7 @@
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
                 document.body.classList.add('loaded');
-                startMining();
-            }, 3000); // إخفاء شاشة التحميل بعد 3 ثواني
+            }, 3000);
         };
     </script>
 </body>
