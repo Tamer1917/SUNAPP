@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
+<!-- saved from url=(0052)file:///C:/Users/LENOVO/Desktop/frapp/new/index.html -->
+<html lang="ar" style="--tg-viewport-height: 100vh; --tg-viewport-stable-height: 100vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram WebApp</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script type="module" src="script.js"></script>
+    <script src="./Telegram WebApp_files/telegram-web-app.js.تنزيل"></script>
+    <script type="module" src="./Telegram WebApp_files/script.js.تنزيل"></script>
 </head>
-<body>
-    <h1>مرحبًا <span id="username">...</span>!</h1>
-    <p>نقاطك: <span id="points">0</span></p>
-</body>
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
+<body class="loaded">
+    <h1>مرحبًا <span id="username">اسم المستخدم: غير معروف</span>!</h1>
+    <p>نقاطك: <span id="points">عدد النقاط: 0</span></p>
+
+
+
+
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>معلومات المستخدم و المهام</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="material/css/styles.css">
+    <link rel="stylesheet" href="./Telegram WebApp_files/all.min.css">
+    <link rel="stylesheet" href="./Telegram WebApp_files/styles.css">
     <style>
         /* شاشة التحميل */
         body, html {
@@ -154,10 +154,10 @@
             color: #ddd;
         }
     </style>
-</head>
-<body>
+
+
     <!-- شاشة التحميل -->
-    <div class="loading-container" id="loading-screen">
+    <div class="loading-container hidden" id="loading-screen">
         <div>
             <h1>Loading...</h1>
             <div class="spinner"></div>
@@ -165,50 +165,46 @@
     </div>
 
     <!-- الصفحة الرئيسية -->
-    <div id="main-content" class="hidden">
-        <div class="container">
-            <h1>مرحبًا بك في التطبيق!</h1>
-            <div class="username" id="username">اسم المستخدم: ...</div>
-            <div class="points" id="points">عدد النقاط: ...</div>
-        </div>
+    <div id="main-content" class="">
+        
 
         <div class="task-container">
             <!-- المهام -->
             <div class="task">
                 <div class="task-detail">
                     <div class="task-image">
-                        <img src="material/images/logo.png" width="45px" alt="">
+                        <img src="./Telegram WebApp_files/logo.png" width="45px" alt="">
                     </div>
                     <div>
                         <h4>claim rewards</h4>
                         <div class="task-data">
-                            <img src="material/images/logo.png" width="20px" alt="Coin Icon">
+                            <img src="./Telegram WebApp_files/logo.png" width="20px" alt="Coin Icon">
                             <h5>300</h5>
                         </div>
                     </div>
                 </div>
-                <button class="task-button" onclick="completeTask(300, 'reward.html')">🦴 claim</button>
+                <button class="task-button" onclick="completeTask(300, &#39;reward.html&#39;)">🦴 claim</button>
             </div>
         </div>
 
         <nav class="bottom-nav">
-            <a href="home.html" class="nav-item">
+            <a href="file:///C:/Users/LENOVO/Desktop/frapp/new/home.html" class="nav-item">
                 <i class="fas fa-home"></i>
                 <span>HOME</span>
             </a>
-            <a href="leaderboard.html" class="nav-item">
+            <a href="file:///C:/Users/LENOVO/Desktop/frapp/new/leaderboard.html" class="nav-item">
                 <i class="fas fa-trophy"></i>
                 <span>LEADERBOARD</span>
             </a>
-            <a href="invite-friends.html" class="nav-item">
+            <a href="file:///C:/Users/LENOVO/Desktop/frapp/new/invite-friends.html" class="nav-item">
                 <i class="fas fa-user-friends"></i>
                 <span>FRIENDS</span>
             </a>
-            <a href="task.html" class="nav-item">
+            <a href="file:///C:/Users/LENOVO/Desktop/frapp/new/task.html" class="nav-item">
                 <i class="fas fa-tasks"></i>
                 <span>TASKS</span>
             </a>
-            <a href="balance.html" class="nav-item">
+            <a href="file:///C:/Users/LENOVO/Desktop/frapp/new/balance.html" class="nav-item">
                 <i class="fas fa-wallet"></i>
                 <span>BALANCE</span>
             </a>
@@ -239,5 +235,6 @@
             }, 3000);
         };
     </script>
-</body>
-</html>
+
+
+</body></html>
