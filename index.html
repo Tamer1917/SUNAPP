@@ -50,7 +50,7 @@
             z-index: 10;
         }
 
-        /* ✅ تصميم المربع العلوي (اسم المستخدم والنقاط) */
+        /* ✅ تصميم المربع العلوي */
         .container {
             background: rgba(255, 255, 255, 0.1);
             padding: 15px;
@@ -119,18 +119,18 @@
             transform: scale(1.05);
         }
 
-        /* ✅ تصميم القسم السفلي مع الخلفية */
+        /* ✅ تصميم الخلفية */
         .bottom-section {
             width: 100%;
             height: 250px;
-            background: url('file-CBmK6pw2DdDa4634PWMDbc') no-repeat center center;
+            background: url('https://your-image-url.com/image.png') no-repeat center center;
             background-size: cover;
             position: absolute;
-            bottom: 50px; /* ✅ تعديل ليظهر فوق شريط التنقل */
+            bottom: 50px;
             left: 0;
         }
 
-        /* ✅ شريط التنقل في أسفل الصفحة */
+        /* ✅ شريط التنقل */
         .nav-bar {
             position: absolute;
             bottom: 0;
@@ -145,7 +145,7 @@
 
         .nav-item {
             color: white;
-            font-size: 10px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             padding: 10px;
@@ -191,7 +191,7 @@
     </div>
 
     <script>
-        let progress = 0;
+        let progress = localStorage.getItem("progress") ? parseInt(localStorage.getItem("progress")) : 0;
         const progressBar = document.getElementById("mining-progress");
         const progressText = document.getElementById("progress-text");
         const claimBtn = document.getElementById("claim-btn");
@@ -201,6 +201,7 @@
                 progress += 20;
                 progressBar.style.width = progress + "%";
                 progressText.innerText = `${progress / 20} / 5`;
+                localStorage.setItem("progress", progress);
             }
 
             if (progress === 100) {
@@ -209,10 +210,12 @@
         }
 
         function claimReward() {
-            alert("تم استلام المكافأة! 🎉");
+            alert("🎉 تم استلام المكافأة!");
             claimBtn.style.display = "none";
             progress = 0;
-            updateProgress();
+            progressBar.style.width = "0%";
+            progressText.innerText = "0 / 5";
+            localStorage.setItem("progress", progress);
         }
 
         setInterval(updateProgress, 2000);
