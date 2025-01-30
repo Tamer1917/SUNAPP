@@ -18,7 +18,7 @@
     <script type="module" src="script.js"></script>
 
     <style>
-        /* ✅ تحسين الخطوط والتنسيقات العامة */
+        /* ✅ تحسين التنسيقات العامة */
         * {
             margin: 0;
             padding: 0;
@@ -80,7 +80,7 @@
             margin: 20px auto;
             padding: 5px;
             position: relative;
-            top: -10px; /* تحريكه للأعلى قليلاً */
+            top: -10px;
         }
 
         .progress-bar {
@@ -119,72 +119,15 @@
             transform: scale(1.05);
         }
 
-        /* ✅ تحسين تصميم المهام */
-        .task-container {
-            margin-top: 20px;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .task {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .task:hover {
-            transform: scale(1.02);
-        }
-
-        .task h4 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .task-button {
-            background-color: #facc15;
-            color: black;
-            font-weight: bold;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 20px;
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .task-button:hover {
-            transform: scale(1.1);
-        }
-
-        /* ✅ تصميم شريط التنقل السفلي */
-        nav.bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
+        /* ✅ تصميم القسم السفلي مع الخلفية */
+        .bottom-section {
             width: 100%;
-        }
-
-        nav.bottom-nav .nav-item {
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        nav.bottom-nav .nav-item:hover {
-            color: #facc15;
+            height: 250px;
+            background: url('/mnt/data/Black Vintage Novel Book Cover (1).png') no-repeat center center;
+            background-size: cover;
+            position: absolute;
+            bottom: 0;
+            left: 0;
         }
 
     </style>
@@ -210,23 +153,29 @@
         <!-- زر CLIM -->
         <button id="claim-btn">🦴 CLIM</button>
 
-        <!-- المهام -->
-        <div class="task-container">
-            <div class="task">
-                <h4>مهمة يومية</h4>
-                <button class="task-button">إكمال</button>
-            </div>
-        </div>
-
-        <!-- شريط التنقل -->
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item">🏠 الصفحة الرئيسية</a>
-            <a href="#" class="nav-item">🏆 الترتيب</a>
-            <a href="#" class="nav-item">👥 الأصدقاء</a>
-        </nav>
+        <!-- القسم السفلي -->
+        <div class="bottom-section"></div>
     </div>
 
     <script>
+        // ✅ تشغيل شريط التقدم بشكل صحيح
+        let progress = 0;
+        const progressBar = document.getElementById("mining-progress");
+        const progressText = document.getElementById("progress-text");
+
+        function updateProgress() {
+            if (progress < 100) {
+                progress += 20;
+                progressBar.style.width = progress + "%";
+                progressText.innerText = `${progress / 20} / 5`;
+            } else {
+                document.getElementById("claim-btn").style.display = "block";
+            }
+        }
+
+        setInterval(updateProgress, 2000);
+
+        // ✅ إخفاء شاشة التحميل بعد ثانيتين
         setTimeout(() => {
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('main-content').classList.remove('hidden');
