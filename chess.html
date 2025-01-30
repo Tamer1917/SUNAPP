@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>لعبة الشطرنج</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 40px);
+            grid-template-rows: repeat(8, 40px);
+            width: 320px;
+            height: 320px;
+            margin: 35px auto;
+        }
+        .square {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .black { background-color: #8B4513; }
+        .white { background-color: #f0d9b5; }
+        .piece {
+            font-size: 28px;
+        }
+        .selected {
+            border: 2px solid yellow;
+        }
+        .turn-indicator {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
+    <div class="board" id="board"></div>
+
+    <script>
+        const board = document.getElementById('board');
+        const turnIndicator = document.getElementById('turnIndicator');
+        const initialBoard = [
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+        ];
+
+        const pieces = {
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+        };
+
+        let currentPlayer = 'white';
+        let selectedSquare = null;
+
+        function createBoard() {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    square.classList.add((row + col) % 2 === 0 ? 'white' : 'black');
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+
+                    if (initialBoard[row][col]) {
+                        const piece = document.createElement('span');
+                        piece.classList.add('piece');
+                        piece.textContent = pieces[initialBoard[row][col]];
+                        square.appendChild(piece);
+                    }
+
+                    square.addEventListener('click', () => onSquareClick(row, col));
+                    board.appendChild(square);
+                }
+            }
+        }
+
+        function onSquareClick(row, col) {
+            const piece = initialBoard[row][col];
+            if (selectedSquare) {
+                const [prevRow, prevCol] = selectedSquare;
+                if (isValidMove(prevRow, prevCol, row, col)) {
+                    movePiece(prevRow, prevCol, row, col);
+                    changeTurn();
+                }
+                deselectSquare();
+            } else if (piece && isPieceOfCurrentPlayer(piece)) {
+                selectSquare(row, col);
+            }
+        }
+
+        function selectSquare(row, col) {
+            if (selectedSquare) deselectSquare();
+            selectedSquare = [row, col];
+            const square = getSquareElement(row, col);
+            square.classList.add('selected');
+        }
+
+        function deselectSquare() {
+            if (selectedSquare) {
+                const [row, col] = selectedSquare;
+                const square = getSquareElement(row, col);
+                square.classList.remove('selected');
+                selectedSquare = null;
+            }
+        }
+
+        function getSquareElement(row, col) {
+            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
+        }
+
+        function isPieceOfCurrentPlayer(piece) {
+            if (currentPlayer === 'white' && piece === piece.toUpperCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toLowerCase()) return true;
+            return false;
+        }
+
+        function isValidMove(fromRow, fromCol, toRow, toCol) {
+            const currentPiece = initialBoard[fromRow][fromCol];
+            const targetPiece = initialBoard[toRow][toCol];
+
+            // تحقق من حركة البيدق
+            if (currentPiece.toLowerCase() === 'p') {
+                const direction = currentPiece === 'P' ? -1 : 1;
+                if (toRow === fromRow + direction && toCol === fromCol && targetPiece === '') {
+                    return true;
+                }
+                return false;
+            }
+
+            // تحقق من حركة الرخ
+            if (currentPiece.toLowerCase() === 'r') {
+                if (fromRow === toRow) {
+                    const step = toCol > fromCol ? 1 : -1;
+                    for (let col = fromCol + step; col !== toCol; col += step) {
+                        if (initialBoard[fromRow][col] !== '') return false;
+                    }
+                } else if (fromCol === toCol) {
+                    const step = toRow > fromRow ? 1 : -1;
+                    for (let row = fromRow + step; row !== toRow; row += step) {
+                        if (initialBoard[row][fromCol] !== '') return false;
+                    }
+                } else {
+                    return false;
+                }
+                return targetPiece === '' || isOpponentPiece(targetPiece);
+            }
+
+            // تحقق من حركة الحصان
+            if (currentPiece.toLowerCase() === 'n') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            // تحقق من حركة الفيل
+            if (currentPiece.toLowerCase() === 'b') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if (rowDiff === colDiff) {
+                    const rowStep = toRow > fromRow ? 1 : -1;
+                    const colStep = toCol > fromCol ? 1 : -1;
+                    for (let i = 1; i < rowDiff; i++) {
+                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
+                            return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            // تحقق من حركة الملكة
+            if (currentPiece.toLowerCase() === 'q') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+
+                // حركة قطريّة (مثل الفيل)
+                if (rowDiff === colDiff) {
+                    const rowStep = toRow > fromRow ? 1 : -1;
+                    const colStep = toCol > fromCol ? 1 : -1;
+                    for (let i = 1; i < rowDiff; i++) {
+                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
+                            return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+
+                // حركة أفقيّة أو عموديّة (مثل الرخ)
+                if (fromRow === toRow || fromCol === toCol) {
+                    if (fromRow === toRow) {
+                        const step = toCol > fromCol ? 1 : -1;
+                        for (let col = fromCol + step; col !== toCol; col += step) {
+                            if (initialBoard[fromRow][col] !== '') return false;
+                        }
+                    } else if (fromCol === toCol) {
+                        const step = toRow > fromRow ? 1 : -1;
+                        for (let row = fromRow + step; row !== toRow; row += step) {
+                            if (initialBoard[row][fromCol] !== '') return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+
+                return false;
+            }
+
+            // تحقق من حركة الملك
+            if (currentPiece.toLowerCase() === 'k') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if (rowDiff <= 1 && colDiff <= 1) {
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        function isOpponentPiece(piece) {
+            if (currentPlayer === 'white' && piece === piece.toLowerCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toUpperCase()) return true;
+            return false;
+        }
+
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+            const piece = initialBoard[fromRow][fromCol];
+            initialBoard[toRow][toCol] = piece;
+            initialBoard[fromRow][fromCol] = '';
+            renderBoard();
+        }
+
+        function changeTurn() {
+            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
+        }
+
+        function renderBoard() {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(square => {
+                const row = square.dataset.row;
+                const col = square.dataset.col;
+                const piece = initialBoard[row][col];
+                square.innerHTML = '';
+                if (piece) {
+                    const pieceElement = document.createElement('span');
+                    pieceElement.classList.add('piece');
+                    pieceElement.textContent = pieces[piece];
+                    square.appendChild(pieceElement);
+                }
+            });
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
