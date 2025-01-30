@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// 🔹 إعداد Firebase
+// إعداد Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
     authDomain: "sunapp-85501.firebaseapp.com",
@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 جلب بيانات المستخدم من Telegram
+// جلب بيانات المستخدم من Telegram
 window.Telegram.WebApp.ready();
 const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 
@@ -30,18 +30,15 @@ if (tgUser) {
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-            // 🔹 المستخدم موجود، جلب بياناته
             const userData = userSnap.data();
             console.log("المستخدم موجود:", userData);
 
-            // تحديث عرض اسم المستخدم والنقاط
             document.getElementById("username").textContent = userData.username || username;
             document.getElementById("points").textContent = userData.points || 0;
 
             // بدء شريط التقدم
             startProgress(userData.points || 0, userRef);
         } else {
-            // 🆕 المستخدم جديد، منحه 5 نقاط
             console.log("🚀 مستخدم جديد! يتم منحه 5 نقاط.");
 
             await setDoc(userRef, {
@@ -68,7 +65,6 @@ function startProgress(initialPoints, userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    // تحديث النص في البداية
     progressText.textContent = `${progress} / 100`;
 
     // تحديد الوقت الكامل لملء شريط التقدم (مثلاً 10 ثواني)
@@ -85,7 +81,7 @@ function startProgress(initialPoints, userRef) {
             clearInterval(progressInterval);
 
             // عرض زر CLAIM
-            document.getElementById("claim-btn").style.display = "block"; // إظهار الزر
+            document.getElementById("claim-btn").style.display = "block";
         }
     }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
 }
