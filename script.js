@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // 🔹 إعداد Firebase
 const firebaseConfig = {
@@ -101,14 +101,22 @@ async function claimReward() {
         const userData = userSnap.data();
         const currentPoints = userData.points;
 
+        // إضافة 5 نقاط جديدة
+        const newPoints = currentPoints + 5;
+
         // إضافة النقاط إلى رصيد المستخدم
-        await updateUserPoints(userRef, currentPoints + 5);
+        await updateUserPoints(userRef, newPoints);
 
         // إخفاء زر CLAIM بعد السحب
         document.getElementById("claim-btn").style.display = "none"; // إخفاء الزر
 
         // إعادة تعيين شريط التقدم
         resetProgress();
+
+        // بدء شريط التقدم مرة أخرى بعد فترة قصيرة
+        setTimeout(() => {
+            startProgress(newPoints, userRef);
+        }, 2000); // الانتظار لمدة 2 ثانية قبل البدء بشريط التقدم
     }
 }
 
