@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // 🔹 إعداد Firebase
 const firebaseConfig = {
@@ -34,8 +34,12 @@ if (tgUser) {
             const userData = userSnap.data();
             console.log("المستخدم موجود:", userData);
 
+            // تحديث عرض اسم المستخدم والنقاط
             document.getElementById("username").textContent = userData.username || username;
             document.getElementById("points").textContent = userData.points || 0;
+
+            // بدء شريط التقدم
+            startProgress(userData.points || 0, userRef);
         } else {
             // 🆕 المستخدم جديد، منحه 5 نقاط
             console.log("🚀 مستخدم جديد! يتم منحه 5 نقاط.");
@@ -47,12 +51,51 @@ if (tgUser) {
 
             document.getElementById("username").textContent = username;
             document.getElementById("points").textContent = 5;
+
+            // بدء شريط التقدم
+            startProgress(5, userRef);
         }
     }
 
     checkAndCreateUser(userId, username);
 } else {
     console.log("تعذر الحصول على بيانات المستخدم من Telegram.");
+}
+
+// بدء شريط التقدم
+function startProgress(initialPoints, userRef) {
+    let progress = 0;
+    const progressBar = document.getElementById("mining-progress");
+    const progressText = document.getElementById("progress-text");
+
+    // تحديث النص في البداية
+    progressText.textContent = `${progress} / 100`;
+
+    // تحديد الوقت الكامل لملء شريط التقدم (مثلاً 10 ثواني)
+    const progressInterval = setInterval(() => {
+        progress += 1;
+        const progressPercentage = (progress / 100) * 100;
+
+        // تحديث شريط التقدم
+        progressBar.style.width = `${progressPercentage}%`;
+        progressText.textContent = `${progress} / 100`;
+
+        // عند اكتمال التقدم
+        if (progress >= 100) {
+            clearInterval(progressInterval);
+
+            // إضافة 5 نقاط للمستخدم
+            updateUserPoints(userRef, initialPoints + 5);
+        }
+    }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
+}
+
+// تحديث النقاط في قاعدة البيانات
+async function updateUserPoints(userRef, newPoints) {
+    await updateDoc(userRef, {
+        points: newPoints
+    });
+    document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
