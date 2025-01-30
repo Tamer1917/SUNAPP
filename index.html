@@ -187,7 +187,8 @@
 
     <script>
         function redirectToChess() {
-            window.location.href = "CHESS.HTML";  // الانتقال إلى صفحة CHESS.HTML
+            // استخدم window.location.assign لضمان الانتقال بشكل صحيح
+            window.location.assign("CHESS.HTML");  // الانتقال إلى صفحة CHESS.HTML
         }
     </script>
 
