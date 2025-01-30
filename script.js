@@ -117,6 +117,8 @@ async function claimReward() {
         setTimeout(() => {
             startProgress(newPoints, userRef);
         }, 2000); // الانتظار لمدة 2 ثانية قبل البدء بشريط التقدم
+    } else {
+        console.log("المستخدم غير موجود في قاعدة البيانات.");
     }
 }
 
