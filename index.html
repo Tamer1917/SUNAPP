@@ -3,104 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معلومات المستخدم و المهام</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="material/css/styles.css">
+    <title>Telegram WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module" src="script.js"></script>
-    <style>
-        /* شاشة التحميل */
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
-        .loading-container { display: flex; justify-content: center; align-items: center; height: 100vh; background: url('material/images/loading.gif') no-repeat center center fixed; background-size: cover; color: white; text-align: center; position: absolute; width: 100%; height: 100%; z-index: 10; }
-        .spinner { border: 8px solid rgba(255, 255, 255, 0.1); border-left: 8px solid #d5d7dd; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        body.loaded { overflow: auto; }
-        .hidden { display: none; }
-        .container { text-align: center; margin-top: 50px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); max-width: 400px; margin-left: auto; margin-right: auto; }
-        .username { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .points { font-size: 20px; color: green; }
-        nav.bottom-nav { display: flex; justify-content: space-around; background-color: #333; padding: 10px 0; }
-        nav.bottom-nav .nav-item { color: white; text-decoration: none; font-size: 16px; display: flex; flex-direction: column; align-items: center; }
-    </style>
 </head>
 <body>
-    <!-- شاشة التحميل -->
-    <div class="loading-container" id="loading-screen">
-        <div>
-            <h1>Loading...</h1>
-            <div class="spinner"></div>
-        </div>
-    </div>
-
-    <!-- الصفحة الرئيسية -->
-    <div id="main-content" class="hidden">
-        <div class="container">
-            <h1>مرحبًا بك في التطبيق!</h1>
-            <div class="username" id="username">اسم المستخدم: ...</div>
-            <div class="points" id="points">عدد النقاط: ...</div>
-        </div>
-
-        <nav class="bottom-nav">
-            <a href="home.html" class="nav-item"><i class="fas fa-home"></i><span>HOME</span></a>
-            <a href="leaderboard.html" class="nav-item"><i class="fas fa-trophy"></i><span>LEADERBOARD</span></a>
-            <a href="invite-friends.html" class="nav-item"><i class="fas fa-user-friends"></i><span>FRIENDS</span></a>
-            <a href="task.html" class="nav-item"><i class="fas fa-tasks"></i><span>TASKS</span></a>
-            <a href="balance.html" class="nav-item"><i class="fas fa-wallet"></i><span>BALANCE</span></a>
-        </nav>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-        // إعداد Firebase
-        const firebaseConfig = {
-            apiKey: "API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // جلب بيانات المستخدم من Telegram
-        window.Telegram.WebApp.ready();
-        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
-
-        if (tgUser) {
-            const userId = tgUser.id.toString();
-            const username = tgUser.first_name;
-
-            async function checkAndCreateUser(userId, username) {
-                const userRef = doc(db, "users", userId);
-                const userSnap = await getDoc(userRef);
-
-                if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    document.getElementById("username").textContent = "اسم المستخدم: " + (userData.username || username);
-                    document.getElementById("points").textContent = "عدد النقاط: " + (userData.points || 0);
-                } else {
-                    await setDoc(userRef, { username: username, points: 5 });
-                    document.getElementById("username").textContent = "اسم المستخدم: " + username;
-                    document.getElementById("points").textContent = "عدد النقاط: 5";
-                }
-
-                // إزالة شاشة التحميل
-                setTimeout(() => {
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('main-content').classList.remove('hidden');
-                    document.body.classList.add('loaded');
-                }, 2000);
-            }
-
-            checkAndCreateUser(userId, username);
-        } else {
-            console.log("تعذر الحصول على بيانات المستخدم من Telegram.");
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
-        }
-    </script>
+    <h1>مرحبًا <span id="username">...</span>!</h1>
+    <p>نقاطك: <span id="points">0</span></p>
 </body>
-</html>
