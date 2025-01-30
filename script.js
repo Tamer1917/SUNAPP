@@ -84,7 +84,10 @@ function startProgress(initialPoints, userRef) {
         if (progress >= 100) {
             clearInterval(progressInterval);
 
-            // إضافة 5 نقاط للمستخدم
+            // عرض زر CLAIM
+            document.getElementById("claim-btn").classList.remove("hidden");
+
+            // إضافة 5 نقاط للمستخدم بعد اكتمال التقدم
             updateUserPoints(userRef, initialPoints + 5);
         }
     }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
@@ -96,6 +99,37 @@ async function updateUserPoints(userRef, newPoints) {
         points: newPoints
     });
     document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
+}
+
+// وظيفة سحب النقاط عند الضغط على زر CLAIM
+async function claimReward() {
+    const userId = window.Telegram.WebApp.initDataUnsafe?.user.id.toString();
+    const userRef = doc(db, "users", userId);
+
+    // جلب النقاط الحالية للمستخدم
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+        const userData = userSnap.data();
+        const currentPoints = userData.points;
+
+        // إضافة النقاط إلى رصيد المستخدم
+        await updateUserPoints(userRef, currentPoints + 5);
+
+        // إخفاء زر CLAIM بعد السحب
+        document.getElementById("claim-btn").classList.add("hidden");
+
+        // إعادة تعيين شريط التقدم
+        resetProgress();
+    }
+}
+
+// إعادة تعيين شريط التقدم
+function resetProgress() {
+    const progressBar = document.getElementById("mining-progress");
+    const progressText = document.getElementById("progress-text");
+
+    progressBar.style.width = "0%";
+    progressText.textContent = "0 / 100";
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
