@@ -164,6 +164,14 @@
         </div>
     </div>
 
+    <!-- الصفحة الرئيسية -->
+    <div id="main-content" class="hidden">
+        <div class="container">
+            <h1>مرحبًا بك في التطبيق!</h1>
+            <div class="username" id="username">اسم المستخدم: ...</div>
+            <div class="points" id="points">عدد النقاط: ...</div>
+        </div>
+
         <div class="task-container">
             <!-- المهام -->
             <div class="task">
@@ -217,6 +225,11 @@
             };
         }
 
+        // استدعاء الدالة وعرض البيانات
+        window.onload = function() {
+            const data = getQueryParams();
+            document.getElementById('username').textContent = "اسم المستخدم: " + data.username;
+            document.getElementById('points').textContent = "عدد النقاط: " + data.points;
 
             // معالجة شاشة التحميل
             setTimeout(() => {
