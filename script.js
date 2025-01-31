@@ -64,12 +64,13 @@ function startProgress(userRef) {
     let progress = 0;
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
+
     progressText.textContent = `${progress} / 100`;
+    document.getElementById("claim-btn").style.display = "none";
 
     const progressInterval = setInterval(() => {
         progress += 1;
-        const progressPercentage = (progress / 100) * 100;
-        progressBar.style.width = `${progressPercentage}%`;
+        progressBar.style.width = `${progress}%`;
         progressText.textContent = `${progress} / 100`;
 
         if (progress >= 100) {
@@ -77,36 +78,38 @@ function startProgress(userRef) {
             document.getElementById("claim-btn").style.display = "block";
         }
     }, 100);
+
+    document.getElementById("claim-btn").onclick = async () => {
+        await claimReward(userRef);
+    };
 }
 
 // وظيفة سحب النقاط عند الضغط على زر CLAIM
-async function claimReward() {
-    const userId = window.Telegram.WebApp.initDataUnsafe?.user.id.toString();
-    const userRef = doc(db, "users", userId);
-
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-        const userData = userSnap.data();
-        const newPoints = userData.points + 5;
-
-        await updateDoc(userRef, { points: newPoints });
-        document.getElementById("points").textContent = newPoints;
-        document.getElementById("claim-btn").style.display = "none";
-
-        resetProgress(userRef);
-    } else {
-        console.log("المستخدم غير موجود في قاعدة البيانات.");
+async function claimReward(userRef) {
+    try {
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const newPoints = userData.points + 5;
+            await updateDoc(userRef, { points: newPoints });
+            document.getElementById("points").textContent = newPoints;
+            resetProgress(userRef);
+        } else {
+            console.error("❌ المستخدم غير موجود في قاعدة البيانات.");
+        }
+    } catch (error) {
+        console.error("❌ خطأ أثناء تحديث النقاط:", error);
     }
 }
 
-// إعادة تعيين شريط التقدم وبدء التعدين من جديد
+// إعادة تعيين شريط التقدم
 function resetProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
-
+    
     progressBar.style.width = "0%";
     progressText.textContent = "0 / 100";
-
+    
     setTimeout(() => {
         startProgress(userRef);
     }, 2000);
