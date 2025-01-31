@@ -4,193 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram WebApp</title>
-    <!-- مكتبة Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
-    <!-- خط Google Fonts -->
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
-    <script type="module" src="script.js"></script>
-
-    <style>
-        /* ✅ تحسين التنسيقات العامة */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Cairo', sans-serif;
-        }
-        body, html {
-            background: linear-gradient(to bottom, #1e1e2f, #12121a);
-            color: white;
-            text-align: center;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #12121a;
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            position: absolute;
-            width: 100%;
-            z-index: 10;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            max-width: 350px;
-            margin: 20px auto 10px;
-            text-align: center;
-        }
-        .username {
-            font-size: 22px;
-            font-weight: bold;
-        }
-        .points {
-            font-size: 20px;
-            color: #facc15;
-            font-weight: bold;
-        }
-        .progress-container {
-            width: 80%;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin: 20px auto;
-            padding: 5px;
-            position: relative;
-            top: -10px;
-        }
-        .progress-bar {
-            width: 0%;
-            height: 12px;
-            background: linear-gradient(to right, #facc15, #ff9800);
-            border-radius: 10px;
-            transition: width 0.5s ease-in-out;
-        }
-        .progress-text {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            line-height: 12px;
-            font-size: 14px;
-            color: white;
-        }
-        #claim-btn {
-            display: none;
-            background: linear-gradient(to right, #ff9800, #facc15);
-            color: black;
-            font-weight: bold;
-            border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            border-radius: 25px;
-            margin-top: 15px;
-            transition: transform 0.2s ease-in-out;
-        }
-        #claim-btn:hover {
-            transform: scale(1.05);
-        }
-        .play-now-btn {
-            display: inline-block;
-            background: #facc15;
-            color: black;
-            font-size: 18px;
-            padding: 15px 30px;
-            border-radius: 25px;
-            text-decoration: none;
-            margin-top: 20px;
-            font-weight: bold;
-            transition: transform 0.2s ease-in-out;
-        }
-        .play-now-btn:hover {
-            transform: scale(1.05);
-            background: #ff9800;
-        }
-        .bottom-section {
-            width: 100%;
-            height: 250px;
-            background: url('https://your-image-url.com/image.png') no-repeat center center;
-            background-size: cover;
-            position: absolute;
-            bottom: 50px;
-            left: 0;
-        }
-        .nav-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-        }
-        .nav-item {
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 10px;
-            transition: color 0.3s;
-        }
-        .nav-item.active {
-            color: #facc15;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-
-    <!-- شاشة التحميل -->
     <div class="loading-container" id="loading-screen">جار التحميل...</div>
-
-    <!-- الصفحة الرئيسية -->
     <div id="main-content" class="hidden">
         <div class="container">
             <div class="username" id="username">اسم المستخدم: ...</div>
             <div class="points" id="points">عدد النقاط: ...</div>
         </div>
-
-        <!-- شريط التقدم -->
         <div class="progress-container">
-             <div class="progress-bar" id="mining-progress"></div>
-             <div class="progress-text" id="progress-text">0 / 100</div>
+            <div class="progress-bar" id="mining-progress"></div>
+            <div class="progress-text" id="progress-text">0 / 100</div>
         </div>
-
-        <!-- زر CLAIM -->
         <button id="claim-btn" onclick="claimReward()">♟ CLAIM</button>
-
-        <!-- زر العب الآن -->
         <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 العب الآن</a>
-
-        <!-- القسم السفلي -->
         <div class="bottom-section"></div>
-
-        <!-- شريط التنقل -->
         <div class="nav-bar">
             <div class="nav-item active">🏠 الصفحة الرئيسية</div>
             <div class="nav-item">📋 المهام</div>
             <div class="nav-item">💰 المحفظة</div>
         </div>
     </div>
-
     <script>
         function redirectToChess() {
-            // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
             window.location.assign("CHESS.HTML");
         }
     </script>
-
 </body>
 </html>
