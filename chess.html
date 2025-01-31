@@ -43,7 +43,7 @@
     <script>
         const board = document.getElementById('board');
         const turnIndicator = document.getElementById('turnIndicator');
-        const initialBoard = [
+        let initialBoard = [
             ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
             ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
             ['', '', '', '', '', '', '', ''],
@@ -85,12 +85,17 @@
         }
 
         function onSquareClick(row, col) {
+            if (currentPlayer === 'black') return; // لا يتحكم المستخدم في الأسود
+
             const piece = initialBoard[row][col];
             if (selectedSquare) {
                 const [prevRow, prevCol] = selectedSquare;
                 if (isValidMove(prevRow, prevCol, row, col)) {
                     movePiece(prevRow, prevCol, row, col);
                     changeTurn();
+                    if (currentPlayer === 'black') {
+                        setTimeout(makeAIMove, 500); // تأخير لتحرك الذكاء الاصطناعي
+                    }
                 }
                 deselectSquare();
             } else if (piece && isPieceOfCurrentPlayer(piece)) {
@@ -263,6 +268,143 @@
                     square.appendChild(pieceElement);
                 }
             });
+        }
+
+        // دالة التقييم المُحسَّنة
+        function evaluateBoard(board) {
+            let score = 0;
+            const pieceValues = {
+                'p': 10, 'n': 30, 'b': 30, 'r': 50, 'q': 90, 'k': 900,
+                'P': -10, 'N': -30, 'B': -30, 'R': -50, 'Q': -90, 'K': -900
+            };
+
+            // قيم المربعات المركزية
+            const centerControl = [
+                [0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 1, 2, 2, 2, 2, 1, 0],
+                [0, 2, 4, 4, 4, 4, 2, 0],
+                [0, 2, 4, 6, 6, 4, 2, 0],
+                [0, 2, 4, 6, 6, 4, 2, 0],
+                [0, 2, 4, 4, 4, 4, 2, 0],
+                [0, 1, 2, 2, 2, 2, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0]
+            ];
+
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece) {
+                        score += pieceValues[piece];
+                        // إضافة قيمة السيطرة على المركز
+                        if (piece === piece.toLowerCase()) {
+                            score += centerControl[row][col];
+                        } else {
+                            score -= centerControl[row][col];
+                        }
+                    }
+                }
+            }
+            return score;
+        }
+
+        // خوارزمية Minimax مع تقليم ألفا-بيتا
+        function minimax(board, depth, alpha, beta, maximizingPlayer) {
+            if (depth === 0) {
+                return evaluateBoard(board);
+            }
+
+            let bestValue = maximizingPlayer ? -Infinity : Infinity;
+            const moves = getAllPossibleMoves(board, maximizingPlayer ? 'black' : 'white');
+
+            for (const move of moves) {
+                const [fromRow, fromCol, toRow, toCol] = move;
+                const piece = board[fromRow][fromCol];
+                const targetPiece = board[toRow][toCol];
+
+                // تنفيذ الحركة
+                board[toRow][toCol] = piece;
+                board[fromRow][fromCol] = '';
+
+                const value = minimax(board, depth - 1, alpha, beta, !maximizingPlayer);
+
+                // التراجع عن الحركة
+                board[fromRow][fromCol] = piece;
+                board[toRow][toCol] = targetPiece;
+
+                if (maximizingPlayer) {
+                    bestValue = Math.max(bestValue, value);
+                    alpha = Math.max(alpha, bestValue);
+                } else {
+                    bestValue = Math.min(bestValue, value);
+                    beta = Math.min(beta, bestValue);
+                }
+
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+
+            return bestValue;
+        }
+
+        // دالة للحصول على جميع الحركات الممكنة
+        function getAllPossibleMoves(board, player) {
+            const moves = [];
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const piece = board[row][col];
+                    if (piece && isPieceOfPlayer(piece, player)) {
+                        for (let toRow = 0; toRow < 8; toRow++) {
+                            for (let toCol = 0; toCol < 8; toCol++) {
+                                if (isValidMove(row, col, toRow, toCol)) {
+                                    moves.push([row, col, toRow, toCol]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return moves;
+        }
+
+        function isPieceOfPlayer(piece, player) {
+            if (player === 'white' && piece === piece.toUpperCase()) return true;
+            if (player === 'black' && piece === piece.toLowerCase()) return true;
+            return false;
+        }
+
+        // دالة لاتخاذ قرار الذكاء الاصطناعي
+        function makeAIMove() {
+            const moves = getAllPossibleMoves(initialBoard, 'black');
+            let bestMove = null;
+            let bestValue = -Infinity;
+
+            for (const move of moves) {
+                const [fromRow, fromCol, toRow, toCol] = move;
+                const piece = initialBoard[fromRow][fromCol];
+                const targetPiece = initialBoard[toRow][toCol];
+
+                // تنفيذ الحركة
+                initialBoard[toRow][toCol] = piece;
+                initialBoard[fromRow][fromCol] = '';
+
+                const value = minimax(initialBoard, 4, -Infinity, Infinity, false); // زيادة العمق إلى 4
+
+                // التراجع عن الحركة
+                initialBoard[fromRow][fromCol] = piece;
+                initialBoard[toRow][toCol] = targetPiece;
+
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestMove = move;
+                }
+            }
+
+            if (bestMove) {
+                const [fromRow, fromCol, toRow, toCol] = bestMove;
+                movePiece(fromRow, fromCol, toRow, toCol);
+                changeTurn();
+            }
         }
 
         createBoard();
