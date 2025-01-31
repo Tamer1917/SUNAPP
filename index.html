@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+mport { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // إعداد Firebase
@@ -65,13 +65,13 @@ function startProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    progressText.textContent = `${progress} / 100`;
+    progressText.textContent = ${progress} / 100;
     document.getElementById("claim-btn").style.display = "none";
 
     const progressInterval = setInterval(() => {
         progress += 1;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress} / 100`;
+        progressBar.style.width = ${progress}%;
+        progressText.textContent = ${progress} / 100;
 
         if (progress >= 100) {
             clearInterval(progressInterval);
@@ -121,17 +121,4 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
-});
-
-// وظيفة إعادة التوجيه إلى صفحة CHESS.HTML
-function redirectToChess() {
-    window.location.href = "CHESS.HTML";
-}
-
-// ربط زر PLAY NOW بوظيفة التوجيه
-document.addEventListener("DOMContentLoaded", () => {
-    const playNowBtn = document.querySelector(".play-now-btn");
-    if (playNowBtn) {
-        playNowBtn.addEventListener("click", redirectToChess);
-    }
 });
