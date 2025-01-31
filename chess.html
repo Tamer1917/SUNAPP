@@ -111,7 +111,7 @@
                     movePiece(prevRow, prevCol, row, col);
                     changeTurn();
                     if (currentPlayer === 'black') {
-                        setTimeout(makeAIMove, 500);
+                        makeAIMove(); // حركة فورية للاعب الأسود
                     }
                 }
                 deselectSquare();
@@ -317,17 +317,26 @@
         }
 
         function makeAIMove() {
-            // هذا جزء لتحريك القطع بشكل تلقائي للاعب الأسود
-            // يمكن استبداله بمنطق للذكاء الاصطناعي أو مجرد تحريك عشوائي
-            let randomRow = Math.floor(Math.random() * 8);
-            let randomCol = Math.floor(Math.random() * 8);
-            let randomMoveRow = Math.floor(Math.random() * 8);
-            let randomMoveCol = Math.floor(Math.random() * 8);
-            if (initialBoard[randomRow][randomCol] !== '' && isPieceOfCurrentPlayer(initialBoard[randomRow][randomCol])) {
-                if (isValidMove(randomRow, randomCol, randomMoveRow, randomMoveCol)) {
-                    movePiece(randomRow, randomCol, randomMoveRow, randomMoveCol);
-                    changeTurn();
+            // حركة فورية للاعب الأسود
+            let moved = false;
+            for (let row = 7; row >= 0; row--) {
+                for (let col = 7; col >= 0; col--) {
+                    if (initialBoard[row][col] !== '' && isPieceOfCurrentPlayer(initialBoard[row][col])) {
+                        for (let toRow = 7; toRow >= 0; toRow--) {
+                            for (let toCol = 7; toCol >= 0; toCol--) {
+                                if (isValidMove(row, col, toRow, toCol)) {
+                                    movePiece(row, col, toRow, toCol);
+                                    changeTurn();
+                                    moved = true;
+                                    break;
+                                }
+                            }
+                            if (moved) break;
+                        }
+                    }
+                    if (moved) break;
                 }
+                if (moved) break;
             }
         }
 
