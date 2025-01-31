@@ -37,7 +37,7 @@ if (tgUser) {
             document.getElementById("points").textContent = userData.points || 0;
 
             // بدء شريط التقدم
-            startProgress(userData.points || 0, userRef);
+            startProgress(userRef);
         } else {
             console.log("🚀 مستخدم جديد! يتم منحه 5 نقاط.");
 
@@ -50,7 +50,7 @@ if (tgUser) {
             document.getElementById("points").textContent = 5;
 
             // بدء شريط التقدم
-            startProgress(5, userRef);
+            startProgress(userRef);
         }
     }
 
@@ -60,30 +60,23 @@ if (tgUser) {
 }
 
 // بدء شريط التقدم
-function startProgress(initialPoints, userRef) {
+function startProgress(userRef) {
     let progress = 0;
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
-
     progressText.textContent = `${progress} / 100`;
 
-    // تحديد الوقت الكامل لملء شريط التقدم (مثلاً 10 ثواني)
     const progressInterval = setInterval(() => {
         progress += 1;
         const progressPercentage = (progress / 100) * 100;
-
-        // تحديث شريط التقدم
         progressBar.style.width = `${progressPercentage}%`;
         progressText.textContent = `${progress} / 100`;
 
-        // عند اكتمال التقدم
         if (progress >= 100) {
             clearInterval(progressInterval);
-
-            // عرض زر CLAIM
             document.getElementById("claim-btn").style.display = "block";
         }
-    }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
+    }, 100);
 }
 
 // وظيفة سحب النقاط عند الضغط على زر CLAIM
@@ -91,48 +84,32 @@ async function claimReward() {
     const userId = window.Telegram.WebApp.initDataUnsafe?.user.id.toString();
     const userRef = doc(db, "users", userId);
 
-    // جلب النقاط الحالية للمستخدم
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
         const userData = userSnap.data();
-        const currentPoints = userData.points;
+        const newPoints = userData.points + 5;
 
-        // إضافة 5 نقاط جديدة
-        const newPoints = currentPoints + 5;
+        await updateDoc(userRef, { points: newPoints });
+        document.getElementById("points").textContent = newPoints;
+        document.getElementById("claim-btn").style.display = "none";
 
-        // إضافة النقاط إلى رصيد المستخدم
-        await updateUserPoints(userRef, newPoints);
-
-        // إخفاء زر CLAIM بعد السحب
-        document.getElementById("claim-btn").style.display = "none"; // إخفاء الزر
-
-        // إعادة تعيين شريط التقدم
-        resetProgress();
-
-        // بدء شريط التقدم مرة أخرى بعد فترة قصيرة
-        setTimeout(() => {
-            startProgress(newPoints, userRef);
-        }, 2000); // الانتظار لمدة 2 ثانية قبل البدء بشريط التقدم
+        resetProgress(userRef);
     } else {
         console.log("المستخدم غير موجود في قاعدة البيانات.");
     }
 }
 
-// تحديث النقاط في قاعدة البيانات
-async function updateUserPoints(userRef, newPoints) {
-    await updateDoc(userRef, {
-        points: newPoints
-    });
-    document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
-}
-
-// إعادة تعيين شريط التقدم
-function resetProgress() {
+// إعادة تعيين شريط التقدم وبدء التعدين من جديد
+function resetProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
     progressBar.style.width = "0%";
     progressText.textContent = "0 / 100";
+
+    setTimeout(() => {
+        startProgress(userRef);
+    }, 2000);
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
