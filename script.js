@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// 🔹 إعداد Firebase
+// إعداد Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
     authDomain: "sunapp-85501.firebaseapp.com",
@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 جلب بيانات المستخدم من Telegram
+// جلب بيانات المستخدم من Telegram
 window.Telegram.WebApp.ready();
 const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
 
@@ -30,18 +30,15 @@ if (tgUser) {
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-            // 🔹 المستخدم موجود، جلب بياناته
             const userData = userSnap.data();
             console.log("المستخدم موجود:", userData);
 
-            // تحديث عرض اسم المستخدم والنقاط
             document.getElementById("username").textContent = userData.username || username;
             document.getElementById("points").textContent = userData.points || 0;
 
             // بدء شريط التقدم
             startProgress(userData.points || 0, userRef);
         } else {
-            // 🆕 المستخدم جديد، منحه 5 نقاط
             console.log("🚀 مستخدم جديد! يتم منحه 5 نقاط.");
 
             await setDoc(userRef, {
@@ -68,7 +65,6 @@ function startProgress(initialPoints, userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    // تحديث النص في البداية
     progressText.textContent = `${progress} / 100`;
 
     // تحديد الوقت الكامل لملء شريط التقدم (مثلاً 10 ثواني)
@@ -84,10 +80,42 @@ function startProgress(initialPoints, userRef) {
         if (progress >= 100) {
             clearInterval(progressInterval);
 
-            // إضافة 5 نقاط للمستخدم
-            updateUserPoints(userRef, initialPoints + 5);
+            // عرض زر CLAIM
+            document.getElementById("claim-btn").style.display = "block";
         }
     }, 100); // كل 100 ميللي ثانية سيتم تحديث شريط التقدم
+}
+
+// وظيفة سحب النقاط عند الضغط على زر CLAIM
+async function claimReward() {
+    const userId = window.Telegram.WebApp.initDataUnsafe?.user.id.toString();
+    const userRef = doc(db, "users", userId);
+
+    // جلب النقاط الحالية للمستخدم
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+        const userData = userSnap.data();
+        const currentPoints = userData.points;
+
+        // إضافة 5 نقاط جديدة
+        const newPoints = currentPoints + 5;
+
+        // إضافة النقاط إلى رصيد المستخدم
+        await updateUserPoints(userRef, newPoints);
+
+        // إخفاء زر CLAIM بعد السحب
+        document.getElementById("claim-btn").style.display = "none"; // إخفاء الزر
+
+        // إعادة تعيين شريط التقدم
+        resetProgress();
+
+        // بدء شريط التقدم مرة أخرى بعد فترة قصيرة
+        setTimeout(() => {
+            startProgress(newPoints, userRef);
+        }, 2000); // الانتظار لمدة 2 ثانية قبل البدء بشريط التقدم
+    } else {
+        console.log("المستخدم غير موجود في قاعدة البيانات.");
+    }
 }
 
 // تحديث النقاط في قاعدة البيانات
@@ -96,6 +124,15 @@ async function updateUserPoints(userRef, newPoints) {
         points: newPoints
     });
     document.getElementById("points").textContent = newPoints; // تحديث عدد النقاط في الصفحة
+}
+
+// إعادة تعيين شريط التقدم
+function resetProgress() {
+    const progressBar = document.getElementById("mining-progress");
+    const progressText = document.getElementById("progress-text");
+
+    progressBar.style.width = "0%";
+    progressText.textContent = "0 / 100";
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
