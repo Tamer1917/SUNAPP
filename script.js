@@ -1,4 +1,3 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -66,13 +65,13 @@ function startProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    progressText.textContent = `${progress} / 100`;
+    progressText.textContent = ${progress} / 100;
     document.getElementById("claim-btn").style.display = "none";
 
     const progressInterval = setInterval(() => {
         progress += 1;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress} / 100`;
+        progressBar.style.width = ${progress}%;
+        progressText.textContent = ${progress} / 100;
 
         if (progress >= 100) {
             clearInterval(progressInterval);
@@ -115,33 +114,6 @@ function resetProgress(userRef) {
         startProgress(userRef);
     }, 2000);
 }
-// استرجاع البيانات من localStorage
-const username = localStorage.getItem('username');
-const points = localStorage.getItem('points');
-
-// التحقق من أن البيانات تم استرجاعها (لأغراض التصحيح)
-console.log("تم استرجاع البيانات:", username, points);
-
-// عرض البيانات في الصفحة
-if (username && points) {
-    document.getElementById('chess-username').innerText = username;
-    document.getElementById('chess-points').innerText = points;
-} else {
-    console.error("لم يتم العثور على بيانات المستخدم في localStorage.");
-}
-
-function redirectToChess() {
-    // حفظ البيانات في localStorage
-    const username = document.getElementById('username').innerText;
-    const points = document.getElementById('points').innerText;
-    localStorage.setItem('username', username);
-    localStorage.setItem('points', points);
-
-    // توجيه المستخدم إلى صفحة اللعبة
-    const url = `https://sunapp.vercel.app/chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
-window.location.assign(url);
-
-}
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
 window.addEventListener("load", function() {
@@ -149,5 +121,4 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
-
 });
