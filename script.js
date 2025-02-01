@@ -65,13 +65,13 @@ function startProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    progressText.textContent = ${progress} / 100;
+    progressText.textContent = `${progress} / 100`;
     document.getElementById("claim-btn").style.display = "none";
 
     const progressInterval = setInterval(() => {
         progress += 1;
-        progressBar.style.width = ${progress}%;
-        progressText.textContent = ${progress} / 100;
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `${progress} / 100`;
 
         if (progress >= 100) {
             clearInterval(progressInterval);
@@ -106,10 +106,10 @@ async function claimReward(userRef) {
 function resetProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
-    
+
     progressBar.style.width = "0%";
     progressText.textContent = "0 / 100";
-    
+
     setTimeout(() => {
         startProgress(userRef);
     }, 2000);
@@ -121,4 +121,3 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
-});
