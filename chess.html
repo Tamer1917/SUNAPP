@@ -6,26 +6,8 @@
     <title>لعبة الشطرنج</title>
     <style>
         body {
-            background-color: #808080;
+            background-color: #808080; /* اللون الرمادي */
             font-family: Arial, sans-serif;
-        }
-
-        .user-info {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 20px;
-            color: white;
-        }
-
-        .username {
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .points {
-            font-size: 20px;
-            color: #facc15;
-            font-weight: bold;
         }
 
         .board {
@@ -36,7 +18,6 @@
             height: 320px;
             margin: 35px auto;
         }
-
         .square {
             width: 40px;
             height: 40px;
@@ -45,7 +26,6 @@
             align-items: center;
             cursor: pointer;
         }
-
         .black { background-color: #8B4513; }
         .white { background-color: #f0d9b5; }
         .piece {
@@ -66,28 +46,12 @@
     </style>
 </head>
 <body>
-
-    <div class="user-info">
-        <!-- عرض اسم المستخدم والنقاط -->
-        <div class="username" id="chess-username">USER: ...</div>
-        <div class="points" id="chess-points">POINT: ...</div>
-    </div>
-
     <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
     <div class="board" id="board"></div>
     <div class="timer" id="whiteTimer">الوقت المتبقي للأبيض: 40</div>
     <div class="timer" id="blackTimer">الوقت المتبقي للأسود: 40</div>
 
     <script>
-        // استرجاع البيانات من localStorage
-        const username = localStorage.getItem('username');
-        const points = localStorage.getItem('points');
-
-        // عرض البيانات في الصفحة
-        document.getElementById('chess-username').innerText = "USER: " + username;
-        document.getElementById('chess-points').innerText = "POINT: " + points;
-
-        // بقية كود الشطرنج...
         const board = document.getElementById('board');
         const turnIndicator = document.getElementById('turnIndicator');
         const whiteTimer = document.getElementById('whiteTimer');
@@ -173,7 +137,7 @@
         }
 
         function getSquareElement(row, col) {
-            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
+            return document.querySelector(.square[data-row="${row}"][data-col="${col}"]);
         }
 
         function isPieceOfCurrentPlayer(piece) {
@@ -249,20 +213,24 @@
                         }
                     }
                     return targetPiece === '' || isOpponentPiece(targetPiece);
-                } else if (fromRow === toRow) {
-                    const step = toCol > fromCol ? 1 : -1;
-                    for (let col = fromCol + step; col !== toCol; col += step) {
-                        if (initialBoard[fromRow][col] !== '') return false;
-                    }
-                } else if (fromCol === toCol) {
-                    const step = toRow > fromRow ? 1 : -1;
-                    for (let row = fromRow + step; row !== toRow; row += step) {
-                        if (initialBoard[row][fromCol] !== '') return false;
-                    }
-                } else {
-                    return false;
                 }
-                return targetPiece === '' || isOpponentPiece(targetPiece);
+
+                if (fromRow === toRow || fromCol === toCol) {
+                    if (fromRow === toRow) {
+                        const step = toCol > fromCol ? 1 : -1;
+                        for (let col = fromCol + step; col !== toCol; col += step) {
+                            if (initialBoard[fromRow][col] !== '') return false;
+                        }
+                    } else if (fromCol === toCol) {
+                        const step = toRow > fromRow ? 1 : -1;
+                        for (let row = fromRow + step; row !== toRow; row += step) {
+                            if (initialBoard[row][fromCol] !== '') return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+
+                return false;
             }
 
             if (currentPiece.toLowerCase() === 'k') {
@@ -277,63 +245,103 @@
             return false;
         }
 
+        function isOpponentPiece(piece) {
+            if (currentPlayer === 'white' && piece === piece.toLowerCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toUpperCase()) return true;
+            return false;
+        }
+
         function movePiece(fromRow, fromCol, toRow, toCol) {
             const piece = initialBoard[fromRow][fromCol];
             initialBoard[toRow][toCol] = piece;
             initialBoard[fromRow][fromCol] = '';
-
-            const fromSquare = getSquareElement(fromRow, fromCol);
-            const toSquare = getSquareElement(toRow, toCol);
-
-            if (piece) {
-                const pieceElement = fromSquare.querySelector('.piece');
-                toSquare.appendChild(pieceElement);
-            }
+            renderBoard();
         }
 
         function changeTurn() {
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            turnIndicator.innerText = currentPlayer === 'white' ? 'دور اللاعب: الأبيض' : 'دور اللاعب: الأسود';
-            clearInterval(whiteTimerInterval);
-            clearInterval(blackTimerInterval);
+            turnIndicator.textContent = دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'};
+            resetTimers();
+        }
 
+        function renderBoard() {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(square => {
+                const row = square.dataset.row;
+                const col = square.dataset.col;
+                const piece = initialBoard[row][col];
+                square.innerHTML = '';
+                if (piece) {
+                    const pieceElement = document.createElement('span');
+                    pieceElement.classList.add('piece');
+                    pieceElement.textContent = pieces[piece];
+                    square.appendChild(pieceElement);
+                }
+            });
+        }
+
+        function startTimer() {
             if (currentPlayer === 'white') {
-                startWhiteTimer();
+                whiteTimerInterval = setInterval(() => {
+                    whiteTimeLeft--;
+                    whiteTimer.textContent = الوقت المتبقي للأبيض: ${whiteTimeLeft};
+                    if (whiteTimeLeft === 0) {
+                        clearInterval(whiteTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
             } else {
-                startBlackTimer();
+                blackTimerInterval = setInterval(() => {
+                    blackTimeLeft--;
+                    blackTimer.textContent = الوقت المتبقي للأسود: ${blackTimeLeft};
+                    if (blackTimeLeft === 0) {
+                        clearInterval(blackTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
             }
         }
 
-        function startWhiteTimer() {
-            whiteTimerInterval = setInterval(() => {
-                whiteTimeLeft--;
-                whiteTimer.innerText = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
-                if (whiteTimeLeft <= 0) {
-                    clearInterval(whiteTimerInterval);
-                    alert("الوقت انتهى للاعب الأبيض!");
-                    changeTurn();
-                }
-            }, 1000);
+        function resetTimers() {
+            if (currentPlayer === 'white') {
+                clearInterval(blackTimerInterval);
+                blackTimeLeft = 40;
+                blackTimer.textContent = الوقت المتبقي للأسود: ${blackTimeLeft};
+                startTimer();
+            } else {
+                clearInterval(whiteTimerInterval);
+                whiteTimeLeft = 40;
+                whiteTimer.textContent = الوقت المتبقي للأبيض: ${whiteTimeLeft};
+                startTimer();
+            }
         }
 
-        function startBlackTimer() {
-            blackTimerInterval = setInterval(() => {
-                blackTimeLeft--;
-                blackTimer.innerText = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
-                if (blackTimeLeft <= 0) {
-                    clearInterval(blackTimerInterval);
-                    alert("الوقت انتهى للاعب الأسود!");
-                    changeTurn();
+        function makeAIMove() {
+            // حركة فورية للاعب الأسود
+            let moved = false;
+            for (let row = 7; row >= 0; row--) {
+                for (let col = 7; col >= 0; col--) {
+                    if (initialBoard[row][col] !== '' && isPieceOfCurrentPlayer(initialBoard[row][col])) {
+                        for (let toRow = 7; toRow >= 0; toRow--) {
+                            for (let toCol = 7; toCol >= 0; toCol--) {
+                                if (isValidMove(row, col, toRow, toCol)) {
+                                    movePiece(row, col, toRow, toCol);
+                                    changeTurn();
+                                    moved = true;
+                                    break;
+                                }
+                            }
+                            if (moved) break;
+                        }
+                    }
+                    if (moved) break;
                 }
-            }, 1000);
-        }
-
-        function isOpponentPiece(piece) {
-            return (currentPlayer === 'white' && piece === piece.toLowerCase()) ||
-                (currentPlayer === 'black' && piece === piece.toUpperCase());
+                if (moved) break;
+            }
         }
 
         createBoard();
+        startTimer();
     </script>
 </body>
 </html>
