@@ -10,6 +10,13 @@
             font-family: Arial, sans-serif;
         }
 
+        .user-info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+            color: white;
+        }
+
         .board {
             display: grid;
             grid-template-columns: repeat(8, 40px);
@@ -46,12 +53,25 @@
     </style>
 </head>
 <body>
+    <div class="user-info">
+        <div id="chess-username"></div>
+        <div id="chess-points"></div>
+    </div>
     <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
     <div class="board" id="board"></div>
     <div class="timer" id="whiteTimer">الوقت المتبقي للأبيض: 40</div>
     <div class="timer" id="blackTimer">الوقت المتبقي للأسود: 40</div>
 
     <script>
+        // استرجاع البيانات من localStorage
+        const username = localStorage.getItem('username');
+        const points = localStorage.getItem('points');
+
+        // عرض البيانات في الصفحة
+        document.getElementById('chess-username').innerText = username;
+        document.getElementById('chess-points').innerText = points;
+
+        // بقية كود الشطرنج...
         const board = document.getElementById('board');
         const turnIndicator = document.getElementById('turnIndicator');
         const whiteTimer = document.getElementById('whiteTimer');
