@@ -1,0 +1,46 @@
+body {
+    background-color: #808080; /* اللون الرمادي */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(8, 40px);
+    grid-template-rows: repeat(8, 40px);
+    width: 320px;
+    height: 320px;
+    margin: 35px auto;
+}
+
+.square {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.black { background-color: #8B4513; }
+.white { background-color: #f0d9b5; }
+
+.piece {
+    font-size: 28px;
+}
+
+.selected {
+    border: 2px solid yellow;
+}
+
+.turn-indicator {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.timer {
+    font-size: 20px;
+    text-align: center;
+}
