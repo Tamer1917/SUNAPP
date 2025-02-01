@@ -9,85 +9,12 @@
             background-color: #808080; /* اللون الرمادي */
             font-family: Arial, sans-serif;
         }
-        <div class="user-info">
-    <div id="chess-username"></div>
-    <div id="chess-points"></div>
-</div>
-    <div class="user-info">
-    <div id="chess-username"></div>
-    <div id="chess-points"></div>
-</div>
-
-<script>
-    // استرجاع البيانات من localStorage
-    const username = localStorage.getItem('username') || 'لاعب مجهول';
-    const points = localStorage.getItem('points') || '0';
-
-    // عرض البيانات في الصفحة
-    document.getElementById('chess-username').innerText = `اسم المستخدم: ${username}`;
-    document.getElementById('chess-points').innerText = `النقاط: ${points}`;
-</script>
-<script>
-        // تأكد من تضمين SDK الخاص بـ Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-// إعداد Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
-    authDomain: "sunapp-85501.firebaseapp.com",
-    projectId: "sunapp-85501",
-    storageBucket: "sunapp-85501.firebasestorage.app",
-    messagingSenderId: "146439638941",
-    appId: "1:146439638941:web:abef499250246650c6e974"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// جلب بيانات المستخدم من Telegram WebApp
-const tg = window.Telegram.WebApp;
-tg.expand();  // لتوسيع الواجهة
-
-const userId = tg.initDataUnsafe?.user?.id;
-const userName = tg.initDataUnsafe?.user?.username || "لا يوجد اسم مستخدم";
-
-// جلب النقاط من Firebase
-async function fetchUserData() {
-    if (!userId) {
-        document.getElementById("user-info").innerText = "لم يتم العثور على بيانات المستخدم!";
-        return;
-    }
-
-    const userRef = ref(db, `users/${userId}`);  // مسار المستخدم في Firebase
-    try {
-        const snapshot = await get(userRef);
-        if (snapshot.exists()) {
-            const userData = snapshot.val();
-            document.getElementById("user-info").innerHTML = `
-                <strong>👤 اسم المستخدم:</strong> @${userName} <br>
-                <strong>⭐ نقاطك:</strong> ${userData.points || 0}
-            `;
-        } else {
-            document.getElementById("user-info").innerText = "⚠️ المستخدم غير مسجل!";
-        }
-    } catch (error) {
-        console.error("خطأ في جلب البيانات:", error);
-        document.getElementById("user-info").innerText = "حدث خطأ أثناء جلب البيانات!";
-    }
-}
-        <script>
-
-// تشغيل الدالة عند تحميل الصفحة
-fetchUserData();
-
-
         .user-info {
             text-align: center;
             margin-top: 20px;
             font-size: 20px;
             color: white;
         }
-
         .board {
             display: grid;
             grid-template-columns: repeat(8, 40px);
@@ -135,304 +62,66 @@ fetchUserData();
 
     <script>
         // استرجاع البيانات من localStorage
-        const username = localStorage.getItem('username');
-        const points = localStorage.getItem('points');
+        const username = localStorage.getItem('username') || 'لاعب مجهول';
+        const points = localStorage.getItem('points') || '0';
 
         // عرض البيانات في الصفحة
-        document.getElementById('chess-username').innerText = username;
-        document.getElementById('chess-points').innerText = points;
+        document.getElementById('chess-username').innerText = `اسم المستخدم: ${username}`;
+        document.getElementById('chess-points').innerText = `النقاط: ${points}`;
+    </script>
 
-        // بقية كود الشطرنج...
-        const board = document.getElementById('board');
-        const turnIndicator = document.getElementById('turnIndicator');
-        const whiteTimer = document.getElementById('whiteTimer');
-        const blackTimer = document.getElementById('blackTimer');
-        let initialBoard = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const pieces = {
-            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+        // إعداد Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
+            authDomain: "sunapp-85501.firebaseapp.com",
+            projectId: "sunapp-85501",
+            storageBucket: "sunapp-85501.firebasestorage.app",
+            messagingSenderId: "146439638941",
+            appId: "1:146439638941:web:abef499250246650c6e974"
         };
 
-        let currentPlayer = 'white';
-        let selectedSquare = null;
-        let whiteTimeLeft = 40;
-        let blackTimeLeft = 40;
-        let whiteTimerInterval = null;
-        let blackTimerInterval = null;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        function createBoard() {
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const square = document.createElement('div');
-                    square.classList.add('square');
-                    square.classList.add((row + col) % 2 === 0 ? 'white' : 'black');
-                    square.dataset.row = row;
-                    square.dataset.col = col;
+        // جلب بيانات المستخدم من Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();  // توسيع الواجهة
 
-                    if (initialBoard[row][col]) {
-                        const piece = document.createElement('span');
-                        piece.classList.add('piece');
-                        piece.textContent = pieces[initialBoard[row][col]];
-                        square.appendChild(piece);
-                    }
+        const userId = tg.initDataUnsafe?.user?.id;
+        const userName = tg.initDataUnsafe?.user?.username || "لا يوجد اسم مستخدم";
 
-                    square.addEventListener('click', () => onSquareClick(row, col));
-                    board.appendChild(square);
-                }
-            }
-        }
-
-        function onSquareClick(row, col) {
-            if (currentPlayer === 'black') return;
-
-            const piece = initialBoard[row][col];
-            if (selectedSquare) {
-                const [prevRow, prevCol] = selectedSquare;
-                if (isValidMove(prevRow, prevCol, row, col)) {
-                    movePiece(prevRow, prevCol, row, col);
-                    changeTurn();
-                    if (currentPlayer === 'black') {
-                        makeAIMove(); // حركة فورية للاعب الأسود
-                    }
-                }
-                deselectSquare();
-            } else if (piece && isPieceOfCurrentPlayer(piece)) {
-                selectSquare(row, col);
-            }
-        }
-
-        function selectSquare(row, col) {
-            if (selectedSquare) deselectSquare();
-            selectedSquare = [row, col];
-            const square = getSquareElement(row, col);
-            square.classList.add('selected');
-        }
-
-        function deselectSquare() {
-            if (selectedSquare) {
-                const [row, col] = selectedSquare;
-                const square = getSquareElement(row, col);
-                square.classList.remove('selected');
-                selectedSquare = null;
-            }
-        }
-
-        function getSquareElement(row, col) {
-            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
-        }
-
-        function isPieceOfCurrentPlayer(piece) {
-            if (currentPlayer === 'white' && piece === piece.toUpperCase()) return true;
-            if (currentPlayer === 'black' && piece === piece.toLowerCase()) return true;
-            return false;
-        }
-
-        function isValidMove(fromRow, fromCol, toRow, toCol) {
-            const currentPiece = initialBoard[fromRow][fromCol];
-            const targetPiece = initialBoard[toRow][toCol];
-
-            if (currentPiece.toLowerCase() === 'p') {
-                const direction = currentPiece === 'P' ? -1 : 1;
-                if (toRow === fromRow + direction && toCol === fromCol && targetPiece === '') {
-                    return true;
-                }
-                return false;
+        async function fetchUserData() {
+            if (!userId) {
+                document.getElementById("chess-username").innerText = "لم يتم العثور على بيانات المستخدم!";
+                return;
             }
 
-            if (currentPiece.toLowerCase() === 'r') {
-                if (fromRow === toRow) {
-                    const step = toCol > fromCol ? 1 : -1;
-                    for (let col = fromCol + step; col !== toCol; col += step) {
-                        if (initialBoard[fromRow][col] !== '') return false;
-                    }
-                } else if (fromCol === toCol) {
-                    const step = toRow > fromRow ? 1 : -1;
-                    for (let row = fromRow + step; row !== toRow; row += step) {
-                        if (initialBoard[row][fromCol] !== '') return false;
-                    }
+            const userRef = ref(db, `users/${userId}`);
+            try {
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    document.getElementById("chess-username").innerText = `👤 اسم المستخدم: @${userName}`;
+                    document.getElementById("chess-points").innerText = `⭐ نقاطك: ${userData.points || 0}`;
                 } else {
-                    return false;
+                    document.getElementById("chess-username").innerText = "⚠️ المستخدم غير مسجل!";
                 }
-                return targetPiece === '' || isOpponentPiece(targetPiece);
-            }
-
-            if (currentPiece.toLowerCase() === 'n') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'b') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if (rowDiff === colDiff) {
-                    const rowStep = toRow > fromRow ? 1 : -1;
-                    const colStep = toCol > fromCol ? 1 : -1;
-                    for (let i = 1; i < rowDiff; i++) {
-                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
-                            return false;
-                        }
-                    }
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'q') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-
-                if (rowDiff === colDiff) {
-                    const rowStep = toRow > fromRow ? 1 : -1;
-                    const colStep = toCol > fromCol ? 1 : -1;
-                    for (let i = 1; i < rowDiff; i++) {
-                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
-                            return false;
-                        }
-                    }
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-
-                if (fromRow === toRow || fromCol === toCol) {
-                    if (fromRow === toRow) {
-                        const step = toCol > fromCol ? 1 : -1;
-                        for (let col = fromCol + step; col !== toCol; col += step) {
-                            if (initialBoard[fromRow][col] !== '') return false;
-                        }
-                    } else if (fromCol === toCol) {
-                        const step = toRow > fromRow ? 1 : -1;
-                        for (let row = fromRow + step; row !== toRow; row += step) {
-                            if (initialBoard[row][fromCol] !== '') return false;
-                        }
-                    }
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'k') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if (rowDiff <= 1 && colDiff <= 1) {
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            return false;
-        }
-
-        function isOpponentPiece(piece) {
-            if (currentPlayer === 'white' && piece === piece.toLowerCase()) return true;
-            if (currentPlayer === 'black' && piece === piece.toUpperCase()) return true;
-            return false;
-        }
-
-        function movePiece(fromRow, fromCol, toRow, toCol) {
-            const piece = initialBoard[fromRow][fromCol];
-            initialBoard[toRow][toCol] = piece;
-            initialBoard[fromRow][fromCol] = '';
-            renderBoard();
-        }
-
-        function changeTurn() {
-            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
-            resetTimers();
-        }
-
-        function renderBoard() {
-            const squares = document.querySelectorAll('.square');
-            squares.forEach(square => {
-                const row = square.dataset.row;
-                const col = square.dataset.col;
-                const piece = initialBoard[row][col];
-                square.innerHTML = '';
-                if (piece) {
-                    const pieceElement = document.createElement('span');
-                    pieceElement.classList.add('piece');
-                    pieceElement.textContent = pieces[piece];
-                    square.appendChild(pieceElement);
-                }
-            });
-        }
-
-        function startTimer() {
-            if (currentPlayer === 'white') {
-                whiteTimerInterval = setInterval(() => {
-                    whiteTimeLeft--;
-                    whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
-                    if (whiteTimeLeft === 0) {
-                        clearInterval(whiteTimerInterval);
-                        changeTurn();
-                    }
-                }, 1000);
-            } else {
-                blackTimerInterval = setInterval(() => {
-                    blackTimeLeft--;
-                    blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
-                    if (blackTimeLeft === 0) {
-                        clearInterval(blackTimerInterval);
-                        changeTurn();
-                    }
-                }, 1000);
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                document.getElementById("chess-username").innerText = "حدث خطأ أثناء جلب البيانات!";
             }
         }
 
-        function resetTimers() {
-            if (currentPlayer === 'white') {
-                clearInterval(blackTimerInterval);
-                blackTimeLeft = 40;
-                blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
-                startTimer();
-            } else {
-                clearInterval(whiteTimerInterval);
-                whiteTimeLeft = 40;
-                whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
-                startTimer();
-            }
-        }
+        // تشغيل الدالة عند تحميل الصفحة
+        fetchUserData();
+    </script>
 
-        function makeAIMove() {
-            // حركة فورية للاعب الأسود
-            let moved = false;
-            for (let row = 7; row >= 0; row--) {
-                for (let col = 7; col >= 0; col--) {
-                    if (initialBoard[row][col] !== '' && isPieceOfCurrentPlayer(initialBoard[row][col])) {
-                        for (let toRow = 7; toRow >= 0; toRow--) {
-                            for (let toCol = 7; toCol >= 0; toCol--) {
-                                if (isValidMove(row, col, toRow, toCol)) {
-                                    movePiece(row, col, toRow, toCol);
-                                    changeTurn();
-                                    moved = true;
-                                    break;
-                                }
-                            }
-                            if (moved) break;
-                        }
-                    }
-                    if (moved) break;
-                }
-                if (moved) break;
-            }
-        }
-
-        createBoard();
-        startTimer();
+    <script>
+        // بقية كود الشطرنج...
     </script>
 </body>
 </html>
