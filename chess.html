@@ -137,7 +137,7 @@
         }
 
         function getSquareElement(row, col) {
-            return document.querySelector(.square[data-row="${row}"][data-col="${col}"]);
+            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
         }
 
         function isPieceOfCurrentPlayer(piece) {
@@ -260,7 +260,7 @@
 
         function changeTurn() {
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            turnIndicator.textContent = دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'};
+            turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
             resetTimers();
         }
 
@@ -284,7 +284,7 @@
             if (currentPlayer === 'white') {
                 whiteTimerInterval = setInterval(() => {
                     whiteTimeLeft--;
-                    whiteTimer.textContent = الوقت المتبقي للأبيض: ${whiteTimeLeft};
+                    whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
                     if (whiteTimeLeft === 0) {
                         clearInterval(whiteTimerInterval);
                         changeTurn();
@@ -293,7 +293,7 @@
             } else {
                 blackTimerInterval = setInterval(() => {
                     blackTimeLeft--;
-                    blackTimer.textContent = الوقت المتبقي للأسود: ${blackTimeLeft};
+                    blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
                     if (blackTimeLeft === 0) {
                         clearInterval(blackTimerInterval);
                         changeTurn();
@@ -306,12 +306,12 @@
             if (currentPlayer === 'white') {
                 clearInterval(blackTimerInterval);
                 blackTimeLeft = 40;
-                blackTimer.textContent = الوقت المتبقي للأسود: ${blackTimeLeft};
+                blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
                 startTimer();
             } else {
                 clearInterval(whiteTimerInterval);
                 whiteTimeLeft = 40;
-                whiteTimer.textContent = الوقت المتبقي للأبيض: ${whiteTimeLeft};
+                whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
                 startTimer();
             }
         }
