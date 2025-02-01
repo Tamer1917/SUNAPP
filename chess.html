@@ -44,6 +44,24 @@
             text-align: center;
         }
     </style>
+    <!-- تأكد من تضمين ملفات Firebase وتهيئة التطبيق وفقاً لإعدادات مشروعك -->
+    <!-- على سبيل المثال:
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        databaseURL: "YOUR_DATABASE_URL",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    -->
 </head>
 <body>
     <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
@@ -56,6 +74,7 @@
         const turnIndicator = document.getElementById('turnIndicator');
         const whiteTimer = document.getElementById('whiteTimer');
         const blackTimer = document.getElementById('blackTimer');
+
         let initialBoard = [
             ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
             ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
@@ -78,6 +97,10 @@
         let blackTimeLeft = 40;
         let whiteTimerInterval = null;
         let blackTimerInterval = null;
+        let gameEnded = false; // متغيّر لتحديد انتهاء اللعبة
+
+        // معرف المستخدم الحالي (يجب تهيئته وفقاً لطريقة تسجيل الدخول في مشروعك)
+        const currentUserId = "USER_ID_HERE";
 
         function createBoard() {
             for (let row = 0; row < 8; row++) {
@@ -102,6 +125,9 @@
         }
 
         function onSquareClick(row, col) {
+            if (gameEnded) return; // إذا انتهت اللعبة لا تقبل نقرات جديدة
+
+            // إذا كانت حركة اللاعب الأسود (المحرك) لا نستجيب لنقرات المستخدم
             if (currentPlayer === 'black') return;
 
             const piece = initialBoard[row][col];
@@ -109,9 +135,11 @@
                 const [prevRow, prevCol] = selectedSquare;
                 if (isValidMove(prevRow, prevCol, row, col)) {
                     movePiece(prevRow, prevCol, row, col);
-                    changeTurn();
-                    if (currentPlayer === 'black') {
-                        makeAIMove(); // حركة فورية للاعب الأسود
+                    if (!gameEnded) {  // إذا لم تنته اللعبة بعد نقل القطعة
+                        changeTurn();
+                        if (currentPlayer === 'black') {
+                            makeAIMove(); // حركة فورية للاعب الأسود
+                        }
                     }
                 }
                 deselectSquare();
@@ -251,14 +279,28 @@
             return false;
         }
 
+        // تعديل دالة نقل القطعة لتشمل التحقق من قتل الملكة
         function movePiece(fromRow, fromCol, toRow, toCol) {
             const piece = initialBoard[fromRow][fromCol];
+            const capturedPiece = initialBoard[toRow][toCol];
             initialBoard[toRow][toCol] = piece;
             initialBoard[fromRow][fromCol] = '';
             renderBoard();
+
+            // التحقق من قتل الملكة وإنهاء اللعبة
+            if (capturedPiece === 'Q' || capturedPiece === 'q') {
+                if (capturedPiece === 'Q') {
+                    // تم قتل الملكة البيضاء -> فوز الأسود
+                    endGame('black');
+                } else {
+                    // تم قتل الملكة السوداء -> فوز الأبيض
+                    endGame('white');
+                }
+            }
         }
 
         function changeTurn() {
+            // إذا لم تنته اللعبة، يتم تبديل الدور
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
             turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
             resetTimers();
@@ -317,6 +359,8 @@
         }
 
         function makeAIMove() {
+            if (gameEnded) return; // عدم تنفيذ حركة إذا انتهت اللعبة
+
             // حركة فورية للاعب الأسود
             let moved = false;
             for (let row = 7; row >= 0; row--) {
@@ -326,7 +370,9 @@
                             for (let toCol = 7; toCol >= 0; toCol--) {
                                 if (isValidMove(row, col, toRow, toCol)) {
                                     movePiece(row, col, toRow, toCol);
-                                    changeTurn();
+                                    if (!gameEnded) { // إذا لم تنته اللعبة بعد حركة الذكاء الاصطناعي
+                                        changeTurn();
+                                    }
                                     moved = true;
                                     break;
                                 }
@@ -338,6 +384,37 @@
                 }
                 if (moved) break;
             }
+        }
+
+        // دالة إنهاء اللعبة وتحديث رصيد المستخدم عبر Firebase
+        function endGame(winner) {
+            gameEnded = true; // منع أي حركات إضافية
+            alert(`انتهت اللعبة. فاز ${winner === 'white' ? 'الأبيض' : 'الأسود'}.`);
+            
+            // تحديث رصيد المستخدم في Firebase
+            // يجب التأكد من تهيئة Firebase مسبقاً وأن currentUserId معرف
+            var userRef = firebase.database().ref("users/" + currentUserId);
+            userRef.once("value")
+                .then(function(snapshot) {
+                    let currentScore = snapshot.val().score || 0;
+                    let newScore;
+                    if (winner === "white") {
+                        newScore = currentScore + 2;
+                    } else {
+                        newScore = currentScore - 2;
+                    }
+                    return userRef.update({ score: newScore });
+                })
+                .then(function() {
+                    console.log("تم تحديث رصيد المستخدم.");
+                })
+                .catch(function(error) {
+                    console.error("خطأ في تحديث رصيد المستخدم:", error);
+                });
+
+            // إيقاف المؤقتات
+            clearInterval(whiteTimerInterval);
+            clearInterval(blackTimerInterval);
         }
 
         createBoard();
