@@ -13,7 +13,21 @@
     <div id="chess-username"></div>
     <div id="chess-points"></div>
 </div>
-    
+    <div class="user-info">
+    <div id="chess-username"></div>
+    <div id="chess-points"></div>
+</div>
+
+<script>
+    // استرجاع البيانات من localStorage
+    const username = localStorage.getItem('username') || 'لاعب مجهول';
+    const points = localStorage.getItem('points') || '0';
+
+    // عرض البيانات في الصفحة
+    document.getElementById('chess-username').innerText = `اسم المستخدم: ${username}`;
+    document.getElementById('chess-points').innerText = `النقاط: ${points}`;
+</script>
+
 
         .user-info {
             text-align: center;
