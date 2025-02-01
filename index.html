@@ -197,9 +197,11 @@
         function redirectToChess() {
             // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
             window.location.assign("https://sunapp.vercel.app/chess.html");
-
-            const url ="https://sunapp.vercel.app/chess.html"?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)};
+        
+            // تحويل البيانات إلى URL-friendly
+            const url = chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)};
             window.location.href = url;
+        }
             
         }
     </script>
