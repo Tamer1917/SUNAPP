@@ -106,10 +106,10 @@ async function claimReward(userRef) {
 function resetProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
-
+    
     progressBar.style.width = "0%";
     progressText.textContent = "0 / 100";
-
+    
     setTimeout(() => {
         startProgress(userRef);
     }, 2000);
@@ -121,3 +121,5 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
+
+});
