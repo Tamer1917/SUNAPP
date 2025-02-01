@@ -15,7 +15,6 @@
     <script type="module" src="script.js"></script>
 
     <style>
-        /* ✅ تحسين التنسيقات العامة */
         * {
             margin: 0;
             padding: 0;
@@ -28,20 +27,6 @@
             text-align: center;
             height: 100%;
             width: 100%;
-            overflow: hidden;
-        }
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #12121a;
-            color: white;
-            font-size: 22px;
-            font-weight: bold;
-            position: absolute;
-            width: 100%;
-            z-index: 10;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
@@ -49,7 +34,7 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             max-width: 350px;
-            margin: 20px auto 10px;
+            margin: 20px auto;
             text-align: center;
         }
         .username {
@@ -61,46 +46,6 @@
             color: #facc15;
             font-weight: bold;
         }
-        .progress-container {
-            width: 80%;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin: 20px auto;
-            padding: 5px;
-            position: relative;
-            top: -10px;
-        }
-        .progress-bar {
-            width: 0%;
-            height: 12px;
-            background: linear-gradient(to right, #facc15, #ff9800);
-            border-radius: 10px;
-            transition: width 0.5s ease-in-out;
-        }
-        .progress-text {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            line-height: 12px;
-            font-size: 14px;
-            color: white;
-        }
-        #claim-btn {
-            display: none;
-            background: linear-gradient(to right, #ff9800, #facc15);
-            color: black;
-            font-weight: bold;
-            border: none;
-            padding: 8px 14px;
-            cursor: pointer;
-            font-size: 10px;
-            border-radius: 20px;
-            margin-top: 10px;
-            transition: transform 0.2s ease-in-out;
-        }
-        #claim-btn:hover {
-            transform: scale(1.05);
-        }
         .play-now-btn {
             display: inline-block;
             background: #facc15;
@@ -111,88 +56,26 @@
             text-decoration: none;
             margin-top: 20px;
             font-weight: bold;
-            transition: transform 0.2s ease-in-out;
-        }
-        .play-now-btn:hover {
-            transform: scale(1.05);
-            background: #ff9800;
-        }
-        .bottom-section {
-            width: 100%;
-            height: 250px;
-            background: url('https://your-image-url.com/image.png') no-repeat center center;
-            background-size: cover;
-            position: absolute;
-            bottom: 50px;
-            left: 0;
-        }
-        .nav-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-        }
-        .nav-item {
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            padding: 10px;
-            transition: color 0.3s;
-        }
-        .nav-item.active {
-            color: #facc15;
         }
     </style>
 </head>
 <body>
 
-    <!-- شاشة التحميل -->
-    <div class="loading-container" id="loading-screen">LOADING...</div>
-
-    <!-- الصفحة الرئيسية -->
-    <div id="main-content" class="hidden">
-        <div class="container">
-            <div class="username" id="username">USER: ...</div>
-            <div class="points" id="points">POINT: ...</div>
-        </div>
-
-        <!-- شريط التقدم -->
-        <div class="progress-container">
-             <div class="progress-bar" id="mining-progress"></div>
-             <div class="progress-text" id="progress-text">0 / 100</div>
-        </div>
-
-        <!-- زر CLAIM -->
-        <button id="claim-btn" onclick="claimReward()">♟ CLAIM</button>
-
-        <!-- زر العب الآن -->
-        <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
-
-        <!-- القسم السفلي -->
-        <div class="bottom-section"></div>
-
-        <!-- شريط التنقل -->
-        <div class="nav-bar">
-            <div class="nav-item active">🏠 HOME</div>
-            <div class="nav-item">📋 TASK</div>
-            <div class="nav-item">💰 WALLET</div>
-        </div>
+    <div class="container">
+        <div class="username" id="username">USER: ...</div>
+        <div class="points" id="points">POINT: ...</div>
     </div>
 
+    <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
+
     <script>
+        const username = "Player1"; // يمكن استبداله ببيانات فعلية
+        const points = 100; // يمكن استبداله ببيانات فعلية
+
+        document.getElementById("username").innerText = `USER: ${username}`;
+        document.getElementById("points").innerText = `POINT: ${points}`;
+
         function redirectToChess() {
-            // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
-            window.location.assign("https://sunapp.vercel.app/chess.html");
-        }
-        
-        function redirectToChess() {
-            // تحويل البيانات إلى URL-friendly
             const url = `chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
             window.location.href = url;
         }
