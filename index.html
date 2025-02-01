@@ -15,6 +15,7 @@
     <script type="module" src="script.js"></script>
 
     <style>
+        /* ✅ تحسين التنسيقات العامة */
         * {
             margin: 0;
             padding: 0;
@@ -27,6 +28,20 @@
             text-align: center;
             height: 100%;
             width: 100%;
+            overflow: hidden;
+        }
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #12121a;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            position: absolute;
+            width: 100%;
+            z-index: 10;
         }
         .container {
             background: rgba(255, 255, 255, 0.1);
@@ -34,7 +49,7 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             max-width: 350px;
-            margin: 20px auto;
+            margin: 20px auto 10px;
             text-align: center;
         }
         .username {
@@ -46,6 +61,46 @@
             color: #facc15;
             font-weight: bold;
         }
+        .progress-container {
+            width: 80%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px auto;
+            padding: 5px;
+            position: relative;
+            top: -10px;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 12px;
+            background: linear-gradient(to right, #facc15, #ff9800);
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            line-height: 12px;
+            font-size: 14px;
+            color: white;
+        }
+        #claim-btn {
+            display: none;
+            background: linear-gradient(to right, #ff9800, #facc15);
+            color: black;
+            font-weight: bold;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 20px;
+            margin-top: 10px;
+            transition: transform 0.2s ease-in-out;
+        }
+        #claim-btn:hover {
+            transform: scale(1.05);
+        }
         .play-now-btn {
             display: inline-block;
             background: #facc15;
@@ -56,11 +111,70 @@
             text-decoration: none;
             margin-top: 20px;
             font-weight: bold;
+            transition: transform 0.2s ease-in-out;
+        }
+        .play-now-btn:hover {
+            transform: scale(1.05);
+            background: #ff9800;
+        }
+        .bottom-section {
+            width: 100%;
+            height: 250px;
+            background: url('https://your-image-url.com/image.png') no-repeat center center;
+            background-size: cover;
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+        }
+        .nav-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .nav-item {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s;
+        }
+        .nav-item.active {
+            color: #facc15;
         }
     </style>
 </head>
 <body>
 
+    <!-- شاشة التحميل -->
+    <div class="loading-container" id="loading-screen">LOADING...</div>
+
+    <!-- الصفحة الرئيسية -->
+    <div id="main-content" class="hidden">
+        <div class="container">
+            <div class="username" id="username">USER: ...</div>
+            <div class="points" id="points">POINT: ...</div>
+        </div>
+
+        <!-- شريط التقدم -->
+        <div class="progress-container">
+             <div class="progress-bar" id="mining-progress"></div>
+             <div class="progress-text" id="progress-text">0 / 100</div>
+        </div>
+
+        <!-- زر CLAIM -->
+        <button id="claim-btn" onclick="claimReward()">♟ CLAIM</button>
+
+        <!-- زر العب الآن -->
+        <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
+
+        
     <div class="container">
         <div class="username" id="username">USER: ...</div>
         <div class="points" id="points">POINT: ...</div>
@@ -68,264 +182,34 @@
 
     <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
 
+
+        <!-- القسم السفلي -->
+        <div class="bottom-section"></div>
+
+        <!-- شريط التنقل -->
+        <div class="nav-bar">
+            <div class="nav-item active">🏠 HOME</div>
+            <div class="nav-item">📋 TASK</div>
+            <div class="nav-item">💰 WALLET</div>
+        </div>
+    </div>
+
     <script>
-        const username = "Player1"; // يمكن استبداله ببيانات فعلية
+          const username = "Player1"; // يمكن استبداله ببيانات فعلية
         const points = 100; // يمكن استبداله ببيانات فعلية
 
         document.getElementById("username").innerText = `USER: ${username}`;
         document.getElementById("points").innerText = `POINT: ${points}`;
-
+        
         function redirectToChess() {
-            const url = `chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
+            // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
+            window.location.assign("https://sunapp.vercel.app/chess.html");
+
+            const url = chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)};
             window.location.href = url;
+            
         }
-  
- const board = document.getElementById('board');
-        const turnIndicator = document.getElementById('turnIndicator');
-        const whiteTimer = document.getElementById('whiteTimer');
-        const blackTimer = document.getElementById('blackTimer');
-        let initialBoard = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-        ];
-
-        const pieces = {
-            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
-            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
-        };
-
-        let currentPlayer = 'white';
-        let selectedSquare = null;
-        let whiteTimeLeft = 40;
-        let blackTimeLeft = 40;
-        let whiteTimerInterval = null;
-        let blackTimerInterval = null;
-
-        function createBoard() {
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const square = document.createElement('div');
-                    square.classList.add('square');
-                    square.classList.add((row + col) % 2 === 0 ? 'white' : 'black');
-                    square.dataset.row = row;
-                    square.dataset.col = col;
-
-                    if (initialBoard[row][col]) {
-                        const piece = document.createElement('span');
-                        piece.classList.add('piece');
-                        piece.textContent = pieces[initialBoard[row][col]];
-                        square.appendChild(piece);
-                    }
-
-                    square.addEventListener('click', () => onSquareClick(row, col));
-                    board.appendChild(square);
-                }
-            }
-        }
-
-        function onSquareClick(row, col) {
-            if (currentPlayer === 'black') return;
-
-            const piece = initialBoard[row][col];
-            if (selectedSquare) {
-                const [prevRow, prevCol] = selectedSquare;
-                if (isValidMove(prevRow, prevCol, row, col)) {
-                    movePiece(prevRow, prevCol, row, col);
-                    changeTurn();
-                    if (currentPlayer === 'black') {
-                        makeAIMove(); // حركة فورية للاعب الأسود
-                    }
-                }
-                deselectSquare();
-            } else if (piece && isPieceOfCurrentPlayer(piece)) {
-                selectSquare(row, col);
-            }
-        }
-
-        function selectSquare(row, col) {
-            if (selectedSquare) deselectSquare();
-            selectedSquare = [row, col];
-            const square = getSquareElement(row, col);
-            square.classList.add('selected');
-        }
-
-        function deselectSquare() {
-            if (selectedSquare) {
-                const [row, col] = selectedSquare;
-                const square = getSquareElement(row, col);
-                square.classList.remove('selected');
-                selectedSquare = null;
-            }
-        }
-
-        function getSquareElement(row, col) {
-            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
-        }
-
-        function isPieceOfCurrentPlayer(piece) {
-            if (currentPlayer === 'white' && piece === piece.toUpperCase()) return true;
-            if (currentPlayer === 'black' && piece === piece.toLowerCase()) return true;
-            return false;
-        }
-
-        function isValidMove(fromRow, fromCol, toRow, toCol) {
-            const currentPiece = initialBoard[fromRow][fromCol];
-            const targetPiece = initialBoard[toRow][toCol];
-
-            if (currentPiece.toLowerCase() === 'p') {
-                const direction = currentPiece === 'P' ? -1 : 1;
-                if (toRow === fromRow + direction && toCol === fromCol && targetPiece === '') {
-                    return true;
-                }
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'r') {
-                if (fromRow === toRow) {
-                    const step = toCol > fromCol ? 1 : -1;
-                    for (let col = fromCol + step; col !== toCol; col += step) {
-                        if (initialBoard[fromRow][col] !== '') return false;
-                    }
-                } else if (fromCol === toCol) {
-                    const step = toRow > fromRow ? 1 : -1;
-                    for (let row = fromRow + step; row !== toRow; row += step) {
-                        if (initialBoard[row][fromCol] !== '') return false;
-                    }
-                } else {
-                    return false;
-                }
-                return targetPiece === '' || isOpponentPiece(targetPiece);
-            }
-
-            if (currentPiece.toLowerCase() === 'n') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'b') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if (rowDiff === colDiff) {
-                    const rowStep = toRow > fromRow ? 1 : -1;
-                    const colStep = toCol > fromCol ? 1 : -1;
-                    for (let i = 1; i < rowDiff; i++) {
-                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
-                            return false;
-                        }
-                    }
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            if (currentPiece.toLowerCase() === 'q') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-
-                if (rowDiff === colDiff) {
-                    const rowStep = toRow > fromRow ? 1 : -1;
-                    const colStep = toCol > fromCol ? 1 : -1;
-                    for (let i = 1; i < rowDiff; i++) {
-                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
-                            return false;
-                        }
-                    }
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                } else if (fromRow === toRow) {
-                    const step = toCol > fromCol ? 1 : -1;
-                    for (let col = fromCol + step; col !== toCol; col += step) {
-                        if (initialBoard[fromRow][col] !== '') return false;
-                    }
-                } else if (fromCol === toCol) {
-                    const step = toRow > fromRow ? 1 : -1;
-                    for (let row = fromRow + step; row !== toRow; row += step) {
-                        if (initialBoard[row][fromCol] !== '') return false;
-                    }
-                } else {
-                    return false;
-                }
-                return targetPiece === '' || isOpponentPiece(targetPiece);
-            }
-
-            if (currentPiece.toLowerCase() === 'k') {
-                const rowDiff = Math.abs(fromRow - toRow);
-                const colDiff = Math.abs(fromCol - toCol);
-                if (rowDiff <= 1 && colDiff <= 1) {
-                    return targetPiece === '' || isOpponentPiece(targetPiece);
-                }
-                return false;
-            }
-
-            return false;
-        }
-
-        function movePiece(fromRow, fromCol, toRow, toCol) {
-            const piece = initialBoard[fromRow][fromCol];
-            initialBoard[toRow][toCol] = piece;
-            initialBoard[fromRow][fromCol] = '';
-
-            const fromSquare = getSquareElement(fromRow, fromCol);
-            const toSquare = getSquareElement(toRow, toCol);
-
-            if (piece) {
-                const pieceElement = fromSquare.querySelector('.piece');
-                toSquare.appendChild(pieceElement);
-            }
-        }
-
-        function changeTurn() {
-            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
-            turnIndicator.innerText = currentPlayer === 'white' ? 'دور اللاعب: الأبيض' : 'دور اللاعب: الأسود';
-            clearInterval(whiteTimerInterval);
-            clearInterval(blackTimerInterval);
-
-            if (currentPlayer === 'white') {
-                startWhiteTimer();
-            } else {
-                startBlackTimer();
-            }
-        }
-
-        function startWhiteTimer() {
-            whiteTimerInterval = setInterval(() => {
-                whiteTimeLeft--;
-                whiteTimer.innerText = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
-                if (whiteTimeLeft <= 0) {
-                    clearInterval(whiteTimerInterval);
-                    alert("الوقت انتهى للاعب الأبيض!");
-                    changeTurn();
-                }
-            }, 1000);
-        }
-
-        function startBlackTimer() {
-            blackTimerInterval = setInterval(() => {
-                blackTimeLeft--;
-                blackTimer.innerText = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
-                if (blackTimeLeft <= 0) {
-                    clearInterval(blackTimerInterval);
-                    alert("الوقت انتهى للاعب الأسود!");
-                    changeTurn();
-                }
-            }, 1000);
-        }
-
-        function isOpponentPiece(piece) {
-            return (currentPlayer === 'white' && piece === piece.toLowerCase()) ||
-                (currentPlayer === 'black' && piece === piece.toUpperCase());
-        }
-
-        createBoard();
     </script>
+
 </body>
 </html>
