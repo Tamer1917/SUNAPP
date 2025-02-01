@@ -114,6 +114,16 @@ function resetProgress(userRef) {
         startProgress(userRef);
     }, 2000);
 }
+function redirectToChess() {
+    // حفظ البيانات في localStorage
+    const username = document.getElementById('username').innerText;
+    const points = document.getElementById('points').innerText;
+    localStorage.setItem('username', username);
+    localStorage.setItem('points', points);
+
+    // توجيه المستخدم إلى صفحة اللعبة
+    window.location.assign("https://sunapp.vercel.app/chess.html");
+}
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
 window.addEventListener("load", function() {
