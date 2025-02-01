@@ -8,75 +8,70 @@
         body {
             background-color: #808080;
             font-family: Arial, sans-serif;
+        }
+
+        .user-info {
             text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
             color: white;
         }
+
+        .username {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .points {
+            font-size: 20px;
+            color: #facc15;
+            font-weight: bold;
+        }
+
         .board {
             display: grid;
             grid-template-columns: repeat(8, 40px);
             grid-template-rows: repeat(8, 40px);
             width: 320px;
             height: 320px;
-            margin: 20px auto;
+            margin: 35px auto;
         }
+
         .square {
             width: 40px;
             height: 40px;
             display: flex;
             justify-content: center;
             align-items: center;
+            cursor: pointer;
         }
+
         .black { background-color: #8B4513; }
         .white { background-color: #f0d9b5; }
+        .piece {
+            font-size: 28px;
+        }
+        .selected {
+            border: 2px solid yellow;
+        }
+        .turn-indicator {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .timer {
+            font-size: 20px;
+            text-align: center;
+        }
     </style>
 </head>
+<body>
 
-    <script>
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
-
-        const username = getQueryParam("username") || "Unknown";
-        const points = getQueryParam("points") || "0";
-
-        document.getElementById("username").innerText = username;
-        document.getElementById("points").innerText = points;
-
-        function createBoard() {
-            const board = document.getElementById("board");
-            for (let row = 0; row < 8; row++) {
-                for (let col = 0; col < 8; col++) {
-                    const square = document.createElement("div");
-                    square.classList.add("square");
-                    square.classList.add((row + col) % 2 === 0 ? "white" : "black");
-                    board.appendChild(square);
-                }
-            }
-        }
-
-        createBoard();
-    </script>
- <script>
-     
-        // جلب البيانات من الرابط (query parameters)
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get("username");
-        const points = urlParams.get("points");
-
-        if (username && points) {
-            document.getElementById('chess-username').innerText = username;
-            document.getElementById('chess-points').innerText = points;
-        } else {
-            console.error("❌ لم يتم العثور على بيانات المستخدم.");
-        }
-     <body>
-
-    <h2>مرحبًا، <span id="username">...</span></h2>
-    <p>نقاطك: <span id="points">...</span></p>
-    <a href="index.html">العودة إلى الرئيسية</a>
-
-    <div class="board" id="board"></div>
+    <div class="user-info">
+        <!-- عرض اسم المستخدم والنقاط -->
+        <div class="username" id="chess-username">USER: ...</div>
+        <div class="points" id="chess-points">POINT: ...</div>
+    </div>
 
     <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
     <div class="board" id="board"></div>
