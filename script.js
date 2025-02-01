@@ -1,3 +1,4 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
@@ -114,6 +115,21 @@ function resetProgress(userRef) {
         startProgress(userRef);
     }, 2000);
 }
+// استرجاع البيانات من localStorage
+const username = localStorage.getItem('username');
+const points = localStorage.getItem('points');
+
+// التحقق من أن البيانات تم استرجاعها (لأغراض التصحيح)
+console.log("تم استرجاع البيانات:", username, points);
+
+// عرض البيانات في الصفحة
+if (username && points) {
+    document.getElementById('chess-username').innerText = username;
+    document.getElementById('chess-points').innerText = points;
+} else {
+    console.error("لم يتم العثور على بيانات المستخدم في localStorage.");
+}
+
 function redirectToChess() {
     // حفظ البيانات في localStorage
     const username = document.getElementById('username').innerText;
