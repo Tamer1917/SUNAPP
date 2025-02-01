@@ -138,7 +138,9 @@ function redirectToChess() {
     localStorage.setItem('points', points);
 
     // توجيه المستخدم إلى صفحة اللعبة
-    window.location.assign("https://sunapp.vercel.app/chess.html");
+    const url = `https://sunapp.vercel.app/chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
+window.location.assign(url);
+
 }
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
