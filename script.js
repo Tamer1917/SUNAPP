@@ -121,4 +121,46 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+// إعداد Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
+    authDomain: "sunapp-85501.firebaseapp.com",
+    projectId: "sunapp-85501",
+    storageBucket: "sunapp-85501.firebasestorage.app",
+    messagingSenderId: "146439638941",
+    appId: "1:146439638941:web:abef499250246650c6e974"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// جلب بيانات المستخدم من Telegram
+window.Telegram.WebApp.ready();
+const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+
+if (tgUser) {
+    const userId = tgUser.id.toString();
+    const username = tgUser.first_name;
+
+    async function fetchUserData() {
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            document.getElementById("userInfo").textContent = `👤 ${userData.username} | 🏆 نقاطك: ${userData.points}`;
+        } else {
+            document.getElementById("userInfo").textContent = "❌ لم يتم العثور على بيانات المستخدم.";
+        }
+    }
+
+    fetchUserData();
+} else {
+    document.getElementById("userInfo").textContent = "❌ تعذر تحميل بيانات المستخدم.";
+}
+
 });
