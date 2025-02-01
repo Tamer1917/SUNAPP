@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -171,10 +172,8 @@
         <!-- زر CLAIM -->
         <button id="claim-btn" onclick="claimReward()">♟ CLAIM</button>
 
-
-        
-    <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
-
+        <!-- زر العب الآن -->
+        <a href="#" class="play-now-btn" onclick="redirectToChess()">🎮 PLAY NOW</a>
 
         <!-- القسم السفلي -->
         <div class="bottom-section"></div>
@@ -188,19 +187,10 @@
     </div>
 
     <script>
-    const username = "Player1"; // يمكن استبداله ببيانات فعلية
-    const points = 100; // يمكن استبداله ببيانات فعلية
-
-    document.getElementById("username").innerText = `USER: ${username}`;
-    document.getElementById("points").innerText = `POINT: ${points}`;
-    
-    function redirectToChess() {
-        // تكوين الرابط مع البيانات
-        const url = `chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
-        
-        // إعادة توجيه المستخدم
-        window.location.href = url;
-    }
+        function redirectToChess() {
+            // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
+            window.location.assign("https://sunapp.vercel.app/chess/indexx.html");
+        }
     </script>
 
 </body>
