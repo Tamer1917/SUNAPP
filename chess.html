@@ -5,29 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>لعبة الشطرنج</title>
     <style>
+        /* styles remain the same */
         body {
             background-color: #808080;
             font-family: Arial, sans-serif;
         }
-
         .user-info {
             text-align: center;
             margin-top: 20px;
             font-size: 20px;
             color: white;
         }
-
         .username {
             font-size: 22px;
             font-weight: bold;
         }
-
         .points {
             font-size: 20px;
             color: #facc15;
             font-weight: bold;
         }
-
         .board {
             display: grid;
             grid-template-columns: repeat(8, 40px);
@@ -36,7 +33,6 @@
             height: 320px;
             margin: 35px auto;
         }
-
         .square {
             width: 40px;
             height: 40px;
@@ -45,7 +41,6 @@
             align-items: center;
             cursor: pointer;
         }
-
         .black { background-color: #8B4513; }
         .white { background-color: #f0d9b5; }
         .piece {
@@ -66,27 +61,79 @@
     </style>
 </head>
 <body>
-
     <div class="user-info">
+        <div id="chess-username"></div>
+        <div id="chess-points"></div>
         <!-- عرض اسم المستخدم والنقاط -->
         <div class="username" id="chess-username">USER: ...</div>
         <div class="points" id="chess-points">POINT: ...</div>
     </div>
-
     <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
     <div class="board" id="board"></div>
     <div class="timer" id="whiteTimer">الوقت المتبقي للأبيض: 40</div>
     <div class="timer" id="blackTimer">الوقت المتبقي للأسود: 40</div>
 
     <script>
+        // استرجاع البيانات من localStorage أو Telegram WebApp
+        const username = localStorage.getItem('username') || 'لاعب مجهول';
+        const points = localStorage.getItem('points') || '0';
         // استرجاع البيانات من localStorage
         const username = localStorage.getItem('username');
         const points = localStorage.getItem('points');
 
         // عرض البيانات في الصفحة
+        document.getElementById('chess-username').innerText = `اسم المستخدم: ${username}`;
+        document.getElementById('chess-points').innerText = `النقاط: ${points}`;
+    </script>
         document.getElementById('chess-username').innerText = "USER: " + username;
         document.getElementById('chess-points').innerText = "POINT: " + points;
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        // إعداد Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrfHwGulQyWW36LodXqNbcPtvV2J1wk8U",
+            authDomain: "sunapp-85501.firebaseapp.com",
+            projectId: "sunapp-85501",
+            storageBucket: "sunapp-85501.firebasestorage.app",
+            messagingSenderId: "146439638941",
+            appId: "1:146439638941:web:abef499250246650c6e974"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        // جلب بيانات المستخدم من Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();  // توسيع الواجهة
+        const userId = tg.initDataUnsafe?.user?.id;
+        const userName = tg.initDataUnsafe?.user?.username || "لا يوجد اسم مستخدم";
+        async function fetchUserData() {
+            if (!userId) {
+                document.getElementById("chess-username").innerText = "لم يتم العثور على بيانات المستخدم!";
+                return;
+            }
+            const userRef = ref(db, `users/${userId}`);
+            try {
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    document.getElementById("chess-username").innerText = `👤 اسم المستخدم: ${userName !== "لا يوجد اسم مستخدم" ? "@" + userName : "مجهول"}`;
+                    document.getElementById("chess-points").innerText = `⭐ نقاطك: ${userData.points || 0}`;
+                } else {
+                    document.getElementById("chess-username").innerText = "⚠️ المستخدم غير مسجل!";
+                }
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+                document.getElementById("chess-username").innerText = "حدث خطأ أثناء جلب البيانات!";
+            }
+        }
+        // تشغيل الدالة عند تحميل الصفحة
+        fetchUserData();
+    </script>
+    <script>
+       
+     /* باقي الكود الخاص بلعبة الشطرنج يبقى كما هو */
+     const board = document.getElementById('board');
         // بقية كود الشطرنج...
         const board = document.getElementById('board');
         const turnIndicator = document.getElementById('turnIndicator');
@@ -249,11 +296,24 @@
                         }
                     }
                     return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                if (fromRow === toRow || fromCol === toCol) {
+                    if (fromRow === toRow) {
+                        const step = toCol > fromCol ? 1 : -1;
+                        for (let col = fromCol + step; col !== toCol; col += step) {
+                            if (initialBoard[fromRow][col] !== '') return false;
+                        }
+                    } else if (fromCol === toCol) {
+                        const step = toRow > fromRow ? 1 : -1;
+                        for (let row = fromRow + step; row !== toRow; row += step) {
+                            if (initialBoard[row][fromCol] !== '') return false;
+                        }
                 } else if (fromRow === toRow) {
                     const step = toCol > fromCol ? 1 : -1;
                     for (let col = fromCol + step; col !== toCol; col += step) {
                         if (initialBoard[fromRow][col] !== '') return false;
                     }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
                 } else if (fromCol === toCol) {
                     const step = toRow > fromRow ? 1 : -1;
                     for (let row = fromRow + step; row !== toRow; row += step) {
@@ -262,6 +322,7 @@
                 } else {
                     return false;
                 }
+                return false;
                 return targetPiece === '' || isOpponentPiece(targetPiece);
             }
 
@@ -277,14 +338,18 @@
             return false;
         }
 
+        function isOpponentPiece(piece) {
+            if (currentPlayer === 'white' && piece === piece.toLowerCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toUpperCase()) return true;
+            return false;
+        }
         function movePiece(fromRow, fromCol, toRow, toCol) {
             const piece = initialBoard[fromRow][fromCol];
             initialBoard[toRow][toCol] = piece;
             initialBoard[fromRow][fromCol] = '';
-
+            renderBoard();
             const fromSquare = getSquareElement(fromRow, fromCol);
             const toSquare = getSquareElement(toRow, toCol);
-
             if (piece) {
                 const pieceElement = fromSquare.querySelector('.piece');
                 toSquare.appendChild(pieceElement);
@@ -293,17 +358,64 @@
 
         function changeTurn() {
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
+            resetTimers();
+        }
+        function renderBoard() {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(square => {
+                const row = square.dataset.row;
+                const col = square.dataset.col;
+                const piece = initialBoard[row][col];
+                square.innerHTML = '';
+                if (piece) {
+                    const pieceElement = document.createElement('span');
+                    pieceElement.classList.add('piece');
+                    pieceElement.textContent = pieces[piece];
+                    square.appendChild(pieceElement);
+                }
+            });
+        }
             turnIndicator.innerText = currentPlayer === 'white' ? 'دور اللاعب: الأبيض' : 'دور اللاعب: الأسود';
             clearInterval(whiteTimerInterval);
             clearInterval(blackTimerInterval);
 
+        function startTimer() {
             if (currentPlayer === 'white') {
+                whiteTimerInterval = setInterval(() => {
+                    whiteTimeLeft--;
+                    whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
+                    if (whiteTimeLeft === 0) {
+                        clearInterval(whiteTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
                 startWhiteTimer();
             } else {
+                blackTimerInterval = setInterval(() => {
+                    blackTimeLeft--;
+                    blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
+                    if (blackTimeLeft === 0) {
+                        clearInterval(blackTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
                 startBlackTimer();
             }
         }
 
+        function resetTimers() {
+            if (currentPlayer === 'white') {
+                clearInterval(blackTimerInterval);
+                blackTimeLeft = 40;
+                blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
+                startTimer();
+            } else {
+                clearInterval(whiteTimerInterval);
+                whiteTimeLeft = 40;
+                whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
+                startTimer();
+            }
         function startWhiteTimer() {
             whiteTimerInterval = setInterval(() => {
                 whiteTimeLeft--;
@@ -316,6 +428,25 @@
             }, 1000);
         }
 
+        function makeAIMove() {
+            // حركة فورية للاعب الأسود
+            let moved = false;
+            for (let row = 7; row >= 0; row--) {
+                for (let col = 7; col >= 0; col--) {
+                    if (initialBoard[row][col] !== '' && isPieceOfCurrentPlayer(initialBoard[row][col])) {
+                        for (let toRow = 7; toRow >= 0; toRow--) {
+                            for (let toCol = 7; toCol >= 0; toCol--) {
+                                if (isValidMove(row, col, toRow, toCol)) {
+                                    movePiece(row, col, toRow, toCol);
+                                    changeTurn();
+                                    moved = true;
+                                    break;
+                                }
+                            }
+                            if (moved) break;
+                        }
+                    }
+                    if (moved) break;
         function startBlackTimer() {
             blackTimerInterval = setInterval(() => {
                 blackTimeLeft--;
@@ -325,8 +456,17 @@
                     alert("الوقت انتهى للاعب الأسود!");
                     changeTurn();
                 }
+                if (moved) break;
+            }
             }, 1000);
         }
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+    const piece = initialBoard[fromRow][fromCol];
+    initialBoard[toRow][toCol] = piece;
+    initialBoard[fromRow][fromCol] = '';
+    localStorage.setItem('chessBoard', JSON.stringify(initialBoard)); // حفظ الرقعة
+    renderBoard();
+}
 
         function isOpponentPiece(piece) {
             return (currentPlayer === 'white' && piece === piece.toLowerCase()) ||
@@ -334,6 +474,7 @@
         }
 
         createBoard();
+        startTimer();
     </script>
 </body>
 </html>
