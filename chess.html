@@ -64,6 +64,18 @@
 
         createBoard();
     </script>
+ <script>
+        // جلب البيانات من الرابط (query parameters)
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get("username");
+        const points = urlParams.get("points");
 
+        if (username && points) {
+            document.getElementById('chess-username').innerText = username;
+            document.getElementById('chess-points').innerText = points;
+        } else {
+            console.error("❌ لم يتم العثور على بيانات المستخدم.");
+        }
+    </script>
 </body>
 </html>
