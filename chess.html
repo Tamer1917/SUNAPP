@@ -408,6 +408,14 @@
                 if (moved) break;
             }
         }
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+    const piece = initialBoard[fromRow][fromCol];
+    initialBoard[toRow][toCol] = piece;
+    initialBoard[fromRow][fromCol] = '';
+    localStorage.setItem('chessBoard', JSON.stringify(initialBoard)); // حفظ الرقعة
+    renderBoard();
+}
+
 
         createBoard();
         startTimer();
