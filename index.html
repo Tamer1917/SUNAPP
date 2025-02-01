@@ -188,22 +188,19 @@
     </div>
 
     <script>
-          const username = "Player1"; // يمكن استبداله ببيانات فعلية
-        const points = 100; // يمكن استبداله ببيانات فعلية
+    const username = "Player1"; // يمكن استبداله ببيانات فعلية
+    const points = 100; // يمكن استبداله ببيانات فعلية
 
-        document.getElementById("username").innerText = `USER: ${username}`;
-        document.getElementById("points").innerText = `POINT: ${points}`;
+    document.getElementById("username").innerText = `USER: ${username}`;
+    document.getElementById("points").innerText = `POINT: ${points}`;
+    
+    function redirectToChess() {
+        // تكوين الرابط مع البيانات
+        const url = `chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)}`;
         
-        function redirectToChess() {
-            // استخدام window.location.assign للانتقال إلى صفحة CHESS.HTML
-            window.location.assign("https://sunapp.vercel.app/chess.html");
-        
-            // تحويل البيانات إلى URL-friendly
-            const url = chess.html?username=${encodeURIComponent(username)}&points=${encodeURIComponent(points)};
-            window.location.href = url;
-        }
-            
-        }
+        // إعادة توجيه المستخدم
+        window.location.href = url;
+    }
     </script>
 
 </body>
