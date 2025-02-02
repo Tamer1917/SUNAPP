@@ -114,6 +114,20 @@ function resetProgress(userRef) {
         startProgress(userRef);
     }, 2000);
 }
+function createUser(userId, username) {
+    let userRef = database.ref("users/" + userId);
+    userRef.once("value").then((snapshot) => {
+        if (!snapshot.exists()) {
+            userRef.set({
+                username: username,
+                points: 0,
+                wins: 0,
+                losses: 0
+            });
+        }
+    });
+}
+
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
 window.addEventListener("load", function() {
