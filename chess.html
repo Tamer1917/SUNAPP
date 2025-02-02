@@ -23,7 +23,7 @@
         </div>
 
         <style>
-            
+
     .username {
         font-size: 22px;
         font-weight: bold;
@@ -313,16 +313,12 @@
             }
         }
 
-      function changeTurn() {
+        function changeTurn() {
             // إذا لم تنته اللعبة، يتم تبديل الدور
             currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
             turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
             resetTimers();
         }
-
-    resetTimers();
-}
-
 
         function renderBoard() {
             const squares = document.querySelectorAll('.square');
@@ -408,7 +404,7 @@
         function endGame(winner) {
             gameEnded = true; // منع أي حركات إضافية
             alert(`انتهت اللعبة. فاز ${winner === 'white' ? 'الأبيض' : 'الأسود'}.`);
-            
+
             // تحديث رصيد المستخدم في Firebase
             // يجب التأكد من تهيئة Firebase مسبقاً وأن currentUserId معرف
             var userRef = firebase.database().ref("users/" + currentUserId);
@@ -440,4 +436,4 @@
     </script>
 </body>
 </html>
-
+~
