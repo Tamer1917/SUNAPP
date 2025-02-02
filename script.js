@@ -73,13 +73,13 @@ function startProgress(userRef) {
     const progressInterval = setInterval(() => {
         progress += 1;
         progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${progress} / 100`;
+        progressText.textContent = `${progress} / 10000`;
 
         if (progress >= 100) {
             clearInterval(progressInterval);
             document.getElementById("claim-btn").style.display = "block";
         }
-    }, 100);
+    }, 10000);
 
 
     document.getElementById("claim-btn").onclick = async () => {
