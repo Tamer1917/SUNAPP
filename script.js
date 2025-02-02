@@ -49,8 +49,8 @@ if (tgUser) {
 
             document.getElementById("username").textContent = username;
             document.getElementById("points").textContent = 5;
-            document.getElementById("win").textContent = userData.lose || 0;
-            document.getElementById("lose").textContent = userData.lose || 0;
+            document.getElementById("ربح").textContent = userData.win || 0;
+            document.getElementById("خسارة").textContent = userData.lose || 0;
 
             // بدء شريط التقدم
             startProgress(userRef);
