@@ -11,3 +11,18 @@ const firebaseConfig = {
 // تهيئة Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+
+function createUser(userId, username) {
+    let userRef = database.ref("users/" + userId);
+    userRef.once("value").then((snapshot) => {
+        if (!snapshot.exists()) {
+            userRef.set({
+                username: username,
+                points: 0,
+                wins: 0,
+                losses: 0
+            });
+        }
+    });
+}
+
