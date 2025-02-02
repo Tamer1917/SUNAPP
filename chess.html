@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram WebApp</title>
+    <!-- مكتبة Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"></script>
+    <!-- خط Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+
+    <<div id="main-content">
+        <div class="container">
+            <div class="username" id="username">USER: ...</div>
+            <div class="points" id="points">POINT: ...</div>
+              <div class="win" id="win">ربح: ...</div>
+
+        </div>
+   </div>
+       
+
+        
+ <!-- Return to Page Button -->
+ <button onclick="window.location.href='https://sunapp.vercel.app/'" 
+ style="position: absolute; 
+        top: 10px; 
+        right: 10px; 
+        padding: 10px 15px; 
+        font-size: 12px; 
+        background-color: #4CAF50; 
+        color: white; 
+        border: none; 
+        border-radius: 5px; 
+        cursor: pointer;">Return to Page
+</button>
+        </div>
+    </div>
+
+
+        
+        <style>
+
+    .username {
+        font-size: 22px;
+        font-weight: bold;
+    }
+    .points {
+        font-size: 20px;
+        color: #facc15;
+        font-weight: bold;
+    }
+    .win {
+        font-size: 20px;
+        color: #facc15;
+        font-weight: bold;
+    }
+    .lose {
+        font-size: 20px;
+        color: #facc15;
+        font-weight: bold;
+    }
+
+    <style>
+        body {
+        
+            font-family: Arial, sans-serif;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 40px);
+            grid-template-rows: repeat(8, 40px);
+            width: 320px;
+            height: 320px;
+            margin: 35px auto;
+        }
+        .square {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .black { background-color: #8B4513; }
+        .white { background-color: #f0d9b5; }
+        .piece {
+            font-size: 28px;
+        }
+        .selected {
+            border: 2px solid yellow;
+        }
+        .turn-indicator {
+            color: white;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .timer {
+            color: white;
+            font-size: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="turn-indicator" id="turnIndicator">دور اللاعب: الأبيض</div>
+    <div class="board" id="board"></div>
+    <div class="timer" id="whiteTimer">الوقت المتبقي للأبيض: 40</div>
+    <div class="timer" id="blackTimer">الوقت المتبقي للأسود: 40</div>
+
+    <script>
+        const board = document.getElementById('board');
+        const turnIndicator = document.getElementById('turnIndicator');
+        const whiteTimer = document.getElementById('whiteTimer');
+        const blackTimer = document.getElementById('blackTimer');
+    
+
+        let initialBoard = [
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', '', '', '', '', '', ''],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+        ];
+
+        const pieces = {
+            'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+            'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+        };
+
+        let currentPlayer = 'white';
+        let selectedSquare = null;
+        let whiteTimeLeft = 40;
+        let blackTimeLeft = 40;
+        let whiteTimerInterval = null;
+        let blackTimerInterval = null;
+        let gameEnded = false; // متغيّر لتحديد انتهاء اللعبة
+
+        // معرف المستخدم الحالي (يجب تهيئته وفقاً لطريقة تسجيل الدخول في مشروعك)
+        const currentUserId = "USER_ID_HERE";
+
+        function createBoard() {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    square.classList.add((row + col) % 2 === 0 ? 'white' : 'black');
+                    square.dataset.row = row;
+                    square.dataset.col = col;
+
+                    if (initialBoard[row][col]) {
+                        const piece = document.createElement('span');
+                        piece.classList.add('piece');
+                        piece.textContent = pieces[initialBoard[row][col]];
+                        square.appendChild(piece);
+                    }
+
+                    square.addEventListener('click', () => onSquareClick(row, col));
+                    board.appendChild(square);
+                }
+            }
+        }
+
+        function onSquareClick(row, col) {
+            if (gameEnded) return; // إذا انتهت اللعبة لا تقبل نقرات جديدة
+
+            // إذا كانت حركة اللاعب الأسود (المحرك) لا نستجيب لنقرات المستخدم
+            if (currentPlayer === 'black') return;
+
+            const piece = initialBoard[row][col];
+            if (selectedSquare) {
+                const [prevRow, prevCol] = selectedSquare;
+                if (isValidMove(prevRow, prevCol, row, col)) {
+                    movePiece(prevRow, prevCol, row, col);
+                    if (!gameEnded) {  // إذا لم تنته اللعبة بعد نقل القطعة
+                        changeTurn();
+                        if (currentPlayer === 'black') {
+                            makeAIMove(); // حركة فورية للاعب الأسود
+                        }
+                    }
+                }
+                deselectSquare();
+            } else if (piece && isPieceOfCurrentPlayer(piece)) {
+                selectSquare(row, col);
+            }
+        }
+
+        function selectSquare(row, col) {
+            if (selectedSquare) deselectSquare();
+            selectedSquare = [row, col];
+            const square = getSquareElement(row, col);
+            square.classList.add('selected');
+        }
+
+        function deselectSquare() {
+            if (selectedSquare) {
+                const [row, col] = selectedSquare;
+                const square = getSquareElement(row, col);
+                square.classList.remove('selected');
+                selectedSquare = null;
+            }
+        }
+
+        function getSquareElement(row, col) {
+            return document.querySelector(`.square[data-row="${row}"][data-col="${col}"]`);
+        }
+
+        function isPieceOfCurrentPlayer(piece) {
+            if (currentPlayer === 'white' && piece === piece.toUpperCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toLowerCase()) return true;
+            return false;
+        }
+
+        function isValidMove(fromRow, fromCol, toRow, toCol) {
+            const currentPiece = initialBoard[fromRow][fromCol];
+            const targetPiece = initialBoard[toRow][toCol];
+
+            if (currentPiece.toLowerCase() === 'p') {
+                const direction = currentPiece === 'P' ? -1 : 1;
+                if (toRow === fromRow + direction && toCol === fromCol && targetPiece === '') {
+                    return true;
+                }
+                return false;
+            }
+
+            if (currentPiece.toLowerCase() === 'r') {
+                if (fromRow === toRow) {
+                    const step = toCol > fromCol ? 1 : -1;
+                    for (let col = fromCol + step; col !== toCol; col += step) {
+                        if (initialBoard[fromRow][col] !== '') return false;
+                    }
+                } else if (fromCol === toCol) {
+                    const step = toRow > fromRow ? 1 : -1;
+                    for (let row = fromRow + step; row !== toRow; row += step) {
+                        if (initialBoard[row][fromCol] !== '') return false;
+                    }
+                } else {
+                    return false;
+                }
+                return targetPiece === '' || isOpponentPiece(targetPiece);
+            }
+
+            if (currentPiece.toLowerCase() === 'n') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            if (currentPiece.toLowerCase() === 'b') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if (rowDiff === colDiff) {
+                    const rowStep = toRow > fromRow ? 1 : -1;
+                    const colStep = toCol > fromCol ? 1 : -1;
+                    for (let i = 1; i < rowDiff; i++) {
+                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
+                            return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            if (currentPiece.toLowerCase() === 'q') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+
+                if (rowDiff === colDiff) {
+                    const rowStep = toRow > fromRow ? 1 : -1;
+                    const colStep = toCol > fromCol ? 1 : -1;
+                    for (let i = 1; i < rowDiff; i++) {
+                        if (initialBoard[fromRow + i * rowStep][fromCol + i * colStep] !== '') {
+                            return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+
+                if (fromRow === toRow || fromCol === toCol) {
+                    if (fromRow === toRow) {
+                        const step = toCol > fromCol ? 1 : -1;
+                        for (let col = fromCol + step; col !== toCol; col += step) {
+                            if (initialBoard[fromRow][col] !== '') return false;
+                        }
+                    } else if (fromCol === toCol) {
+                        const step = toRow > fromRow ? 1 : -1;
+                        for (let row = fromRow + step; row !== toRow; row += step) {
+                            if (initialBoard[row][fromCol] !== '') return false;
+                        }
+                    }
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+
+                return false;
+            }
+
+            if (currentPiece.toLowerCase() === 'k') {
+                const rowDiff = Math.abs(fromRow - toRow);
+                const colDiff = Math.abs(fromCol - toCol);
+                if (rowDiff <= 1 && colDiff <= 1) {
+                    return targetPiece === '' || isOpponentPiece(targetPiece);
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        function isOpponentPiece(piece) {
+            if (currentPlayer === 'white' && piece === piece.toLowerCase()) return true;
+            if (currentPlayer === 'black' && piece === piece.toUpperCase()) return true;
+            return false;
+        }
+
+        // تعديل دالة نقل القطعة لتشمل التحقق من قتل الملكة
+        function movePiece(fromRow, fromCol, toRow, toCol) {
+            const piece = initialBoard[fromRow][fromCol];
+            const capturedPiece = initialBoard[toRow][toCol];
+            initialBoard[toRow][toCol] = piece;
+            initialBoard[fromRow][fromCol] = '';
+            renderBoard();
+
+            // التحقق من قتل الملكة وإنهاء اللعبة
+            if (capturedPiece === 'Q' || capturedPiece === 'q') {
+                if (capturedPiece === 'Q') {
+                    // تم قتل الملكة البيضاء -> فوز الأسود
+                    endGame('black');
+                } else {
+                    // تم قتل الملكة السوداء -> فوز الأبيض
+                    endGame('white');
+                }
+            }
+        }
+
+        function changeTurn() {
+            // إذا لم تنته اللعبة، يتم تبديل الدور
+            currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+            turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
+            resetTimers();
+        }
+
+        function renderBoard() {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(square => {
+                const row = square.dataset.row;
+                const col = square.dataset.col;
+                const piece = initialBoard[row][col];
+                square.innerHTML = '';
+                if (piece) {
+                    const pieceElement = document.createElement('span');
+                    pieceElement.classList.add('piece');
+                    pieceElement.textContent = pieces[piece];
+                    square.appendChild(pieceElement);
+                }
+            });
+        }
+
+        function startTimer() {
+            if (currentPlayer === 'white') {
+                whiteTimerInterval = setInterval(() => {
+                    whiteTimeLeft--;
+                    whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
+                    if (whiteTimeLeft === 0) {
+                        clearInterval(whiteTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
+            } else {
+                blackTimerInterval = setInterval(() => {
+                    blackTimeLeft--;
+                    blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
+                    if (blackTimeLeft === 0) {
+                        clearInterval(blackTimerInterval);
+                        changeTurn();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimers() {
+            if (currentPlayer === 'white') {
+                clearInterval(blackTimerInterval);
+                blackTimeLeft = 40;
+                blackTimer.textContent = `الوقت المتبقي للأسود: ${blackTimeLeft}`;
+                startTimer();
+            } else {
+                clearInterval(whiteTimerInterval);
+                whiteTimeLeft = 40;
+                whiteTimer.textContent = `الوقت المتبقي للأبيض: ${whiteTimeLeft}`;
+                startTimer();
+            }
+        }
+
+        function makeAIMove() {
+            if (gameEnded) return; // عدم تنفيذ حركة إذا انتهت اللعبة
+
+            // حركة فورية للاعب الأسود
+            let moved = false;
+            for (let row = 7; row >= 0; row--) {
+                for (let col = 7; col >= 0; col--) {
+                    if (initialBoard[row][col] !== '' && isPieceOfCurrentPlayer(initialBoard[row][col])) {
+                        for (let toRow = 7; toRow >= 0; toRow--) {
+                            for (let toCol = 7; toCol >= 0; toCol--) {
+                                if (isValidMove(row, col, toRow, toCol)) {
+                                    movePiece(row, col, toRow, toCol);
+                                    if (!gameEnded) { // إذا لم تنته اللعبة بعد حركة الذكاء الاصطناعي
+                                        changeTurn();
+                                    }
+                                    moved = true;
+                                    break;
+                                }
+                            }
+                            if (moved) break;
+                        }
+                    }
+                    if (moved) break;
+                }
+                if (moved) break;
+            }
+        }
+
+        // دالة إنهاء اللعبة وتحديث رصيد المستخدم عبر Firebase
+        function endGame(winner) {
+            gameEnded = true; // منع أي حركات إضافية
+            alert(`انتهت اللعبة. فاز ${winner === 'white' ? 'الأبيض' : 'الأسود'}.`);
+
+            // تحديث رصيد المستخدم في Firebase
+            // يجب التأكد من تهيئة Firebase مسبقاً وأن currentUserId معرف
+            var userRef = firebase.database().ref("users/" + currentUserId);
+            userRef.once("value")
+                .then(function(snapshot) {
+                    let currentScore = snapshot.val().score || 0;
+                    let newScore;
+                    if (winner === "white") {
+                        newScore = currentScore + 2;
+                    } else {
+                        newScore = currentScore - 2;
+                    }
+                    return userRef.update({ score: newScore });
+                })
+                .then(function() {
+                    console.log("تم تحديث رصيد المستخدم.");
+                })
+                .catch(function(error) {
+                    console.error("خطأ في تحديث رصيد المستخدم:", error);
+                });
+
+            // إيقاف المؤقتات
+            clearInterval(whiteTimerInterval);
+            clearInterval(blackTimerInterval);
+        }
+
+        createBoard();
+        startTimer();
+    </script>
+</body>
+</html>
