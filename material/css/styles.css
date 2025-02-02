@@ -147,3 +147,17 @@ body, html {
 .nav-item.active {
     color: #facc15;
 }
+.back-button {
+    background-color: #4CAF50; /* اللون الخلفي */
+    color: white; /* لون النص */
+    padding: 10px 20px; /* الحشو */
+    border: none; /* إزالة الحدود */
+    cursor: pointer; /* تغيير شكل المؤشر عند المرور فوق الزر */
+    font-size: 16px; /* حجم الخط */
+    border-radius: 5px; /* حواف مستديرة */
+    margin-top: 20px; /* مسافة فوق الزر */
+    display: block; /* عرض الزر كعنصر بلوك */
+    margin-left: auto; /* محاذاة الزر في المنتصف */
+    margin-right: auto; /* محاذاة الزر في المنتصف */
+}
+
