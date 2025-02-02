@@ -314,26 +314,22 @@
         }
 
        function changeTurn() {
+    // إذا لم تنته اللعبة، يتم تبديل الدور
     currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
     turnIndicator.textContent = `دور اللاعب: ${currentPlayer === 'white' ? 'الأبيض' : 'الأسود'}`;
 
+    // إظهار عداد الوقت للاعب الحالي وإخفاء الآخر
     if (currentPlayer === 'white') {
-        // مباشرة يبدأ العداد للأبيض
         whiteTimer.style.display = "block";
         blackTimer.style.display = "none";
-        resetTimers();
     } else {
-        // إخفاء العداد الأسود أثناء المهلة
         whiteTimer.style.display = "none";
-        blackTimer.style.display = "none";
-
-        // تأخير بدء عداد الأسود لمدة 5 ثوانٍ
-        setTimeout(() => {
-            blackTimer.style.display = "block"; // إظهار العداد بعد المهلة
-            resetTimers();
-        }, 5000); // مهلة 5 ثوانٍ
+        blackTimer.style.display = "block";
     }
+
+    resetTimers();
 }
+
 
         function renderBoard() {
             const squares = document.querySelectorAll('.square');
