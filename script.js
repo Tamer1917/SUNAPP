@@ -45,8 +45,7 @@ if (tgUser) {
             await setDoc(userRef, {
                 username: username,
                 points: 5
-                win: win,
-                lose: lose,
+           
             });
 
             document.getElementById("username").textContent = userData.username || username;
