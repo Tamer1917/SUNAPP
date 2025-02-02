@@ -67,7 +67,7 @@ function startProgress(userRef) {
     const progressBar = document.getElementById("mining-progress");
     const progressText = document.getElementById("progress-text");
 
-    progressText.textContent = `${progress} / 100`;
+    progressText.textContent = `${progress} / 10000`;
     document.getElementById("claim-btn").style.display = "none";
 
     const progressInterval = setInterval(() => {
