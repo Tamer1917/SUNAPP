@@ -113,6 +113,7 @@ function resetProgress(userRef) {
     setTimeout(() => {
         startProgress(userRef);
     }, 2000);
+}
 
 // إخفاء شاشة التحميل بعد 2 ثانية وعرض المحتوى
 window.addEventListener("load", function() {
@@ -120,5 +121,4 @@ window.addEventListener("load", function() {
         document.getElementById('loading-screen').style.display = 'none';
         document.getElementById('main-content').classList.remove('hidden');
     }, 2000);
-
 });
