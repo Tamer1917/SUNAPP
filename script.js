@@ -83,6 +83,13 @@ function startProgress(userRef) {
         }
     }, 100);
 
+document.getElementById("backButton").addEventListener("click", function() {
+    window.location.href = "https://sunapp.vercel.app/";
+});
+}
+
+    
+
     document.getElementById("claim-btn").onclick = async () => {
         await claimReward(userRef);
     };
