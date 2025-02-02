@@ -20,13 +20,20 @@
         <div class="container">
             <div class="username" id="username">USER: ...</div>
             <div class="points" id="points">POINT: ...</div>
-            <div class="win" id="win"> </div>
-            <div class="lose" id="lose"> </div>
+            <div class="win" id="win"> الربح</div>
+            <div class="lose" id="lose"> الخسارة</div>
+       
      
             
         </div>
    </div>
+          <script>
 
+            const win = document.getElementById('win');
+            const lose = document.getElementById('lose');
+
+
+        
  <!-- Return to Page Button -->
  <button onclick="window.location.href='https://sunapp.vercel.app/'" 
  style="position: absolute; 
@@ -122,7 +129,7 @@
         const turnIndicator = document.getElementById('turnIndicator');
         const whiteTimer = document.getElementById('whiteTimer');
         const blackTimer = document.getElementById('blackTimer');
-        const win = document.getElementById('win');
+    
 
         let initialBoard = [
             ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
