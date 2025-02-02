@@ -24,6 +24,63 @@
             <div class="lose" id="lose">lose: ...</div>
         </div>
    </div>
+
+ <script>
+       const currentUserId = "USER_ID_HERE"; // معرف المستخدم الحالي
+
+        // استرجاع البيانات من Firebase
+        function fetchUserData() {
+            var userRef = firebase.database().ref("users/" + currentUserId);
+            userRef.once("value").then(function(snapshot) {
+                const userData = snapshot.val();
+                document.getElementById('username').textContent = `USER: ${userData.username || 'غير معروف'}`;
+                document.getElementById('points').textContent = `POINT: ${userData.score || 0}`;
+                document.getElementById('win').textContent = `win: ${userData.win || 0}`;
+                document.getElementById('lose').textContent = `lose: ${userData.lose || 0}`;
+            });
+        }
+
+        // تحديث البيانات عند انتهاء اللعبة
+        function endGame(winner) {
+            gameEnded = true;
+            alert(`انتهت اللعبة. فاز ${winner === 'white' ? 'الأبيض' : 'الأسود'}.`);
+            
+            var userRef = firebase.database().ref("users/" + currentUserId);
+            userRef.once("value").then(function(snapshot) {
+                let userData = snapshot.val();
+                let newScore = userData.score || 0;
+                let win = userData.win || 0;
+                let lose = userData.lose || 0;
+
+                if (winner === "white") {
+                    newScore += 2;
+                    win++;
+                } else {
+                    newScore -= 2;
+                    lose++;
+                }
+
+                userRef.update({
+                    score: newScore,
+                    win: win,
+                    lose: lose
+                }).then(function() {
+                    console.log("تم تحديث رصيد المستخدم.");
+                    fetchUserData();  // تحديث الواجهة
+                }).catch(function(error) {
+                    console.error("خطأ في تحديث رصيد المستخدم:", error);
+                });
+            });
+
+            // إيقاف المؤقتات
+            clearInterval(whiteTimerInterval);
+            clearInterval(blackTimerInterval);
+        }
+
+        // استرجاع بيانات المستخدم عند تحميل الصفحة
+        window.onload = function() {
+            fetchUserData();
+        };
         <style>
 
     .username {
@@ -150,75 +207,7 @@
             }
         }
  <script>
-        const currentUserId = "USER_ID_HERE"; // معرف المستخدم الحالي
-
-        // استرجاع البيانات من Firebase
-        function fetchUserData() {
-            var userRef = firebase.database().ref("users/" + currentUserId);
-            userRef.once("value").then(function(snapshot) {
-                const userData = snapshot.val();
-                document.getElementById('username').textContent = `USER: ${userData.username || 'غير معروف'}`;
-                document.getElementById('points').textContent = `POINT: ${userData.score || 0}`;
-                document.getElementById('win').textContent = `win: ${userData.win || 0}`;
-                document.getElementById('lose').textContent = `lose: ${userData.lose || 0}`;
-            });
-        }
-
-        // تحديث البيانات عند انتهاء اللعبة
-        function endGame(winner) {
-            gameEnded = true;
-            alert(`انتهت اللعبة. فاز ${winner === 'white' ? 'الأبيض' : 'الأسود'}.`);
-            
-            var userRef = firebase.database().ref("users/" + currentUserId);
-            userRef.once("value").then(function(snapshot) {
-                let userData = snapshot.val();
-                let newScore = userData.score || 0;
-                let win = userData.win || 0;
-                let lose = userData.lose || 0;
-
-                if (winner === "white") {
-                    newScore += 2;
-                    win++;
-                } else {
-                    newScore -= 2;
-                    lose++;
-                }
-
-                userRef.update({
-                    score: newScore,
-                    win: win,
-                    lose: lose
-                }).then(function() {
-                    console.log("تم تحديث رصيد المستخدم.");
-                    fetchUserData();  // تحديث الواجهة
-                }).catch(function(error) {
-                    console.error("خطأ في تحديث رصيد المستخدم:", error);
-                });
-            });
-
-            // إيقاف المؤقتات
-            clearInterval(whiteTimerInterval);
-            clearInterval(blackTimerInterval);
-        }
-
-        // استرجاع بيانات المستخدم عند تحميل الصفحة
-        window.onload = function() {
-            fetchUserData();
-        };
-    </script>
-
-
-
-
-
-
-
-
-
-
-
-        
-
+     
         function onSquareClick(row, col) {
             if (gameEnded) return; // إذا انتهت اللعبة لا تقبل نقرات جديدة
 
