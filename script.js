@@ -35,8 +35,7 @@ if (tgUser) {
 
             document.getElementById("username").textContent = userData.username || username;
             document.getElementById("points").textContent = userData.points || 0;
-            document.getElementById('win').textContent = "ربح!";
-            document.getElementById("lose").textContent = "خسارة";
+        
         
             // بدء شريط التقدم
             startProgress(userRef);
@@ -50,8 +49,7 @@ if (tgUser) {
 
             document.getElementById("username").textContent = userData.username || username;
             document.getElementById("points").textContent = userData.points || 0;
-            document.getElementById('win').textContent = "ربح!";
-            document.getElementById("lose").textContent = "خسارة";
+        
 
             // بدء شريط التقدم
             startProgress(userRef);
